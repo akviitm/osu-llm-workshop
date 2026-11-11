@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Features - MDTransport</title>
+    <meta name="description" content="Detailed features of MDTransport for transport property analysis from MD simulations.">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <nav class="nav container">
+            <a href="index.html" class="nav-brand">
+                <svg class="logo" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="32" height="32" rx="6" fill="currentColor"/>
+                    <path d="M8 12h16M8 16h12M8 20h8" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+                </svg>
+                <span>MDTransport</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">Overview</a></li>
+                <li><a href="features.html" class="active">Features</a></li>
+                <li><a href="theory.html">Theory</a></li>
+                <li><a href="installation.html">Installation</a></li>
+                <li><a href="performance.html">Performance</a></li>
+                <li><a href="references.html">References</a></li>
+            </ul>
+            <a href="https://github.com/ShahResearchGroup/MDTransport" class="nav-github" target="_blank" rel="noopener">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+                GitHub
+            </a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="page-header">
+            <div class="container">
+                <h1>Features</h1>
+                <p class="page-subtitle">Comprehensive transport property analysis capabilities</p>
+            </div>
+        </section>
+
+        <section class="feature-section">
+            <div class="container">
+                <h2 class="section-title">Supported Simulation Engines</h2>
+                <div class="engine-grid">
+                    <article class="engine-card gromacs">
+                        <div class="engine-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"></rect><path d="M8 21h8"></path><path d="M12 17v4"></path></svg>
+                        </div>
+                        <h3>GROMACS</h3>
+                        <ul class="feature-list">
+                            <li>Trajectory formats: <code>.xtc</code>, <code>.trr</code>, <code>.gro</code>, <code>.pdb</code></li>
+                            <li>Topology: <code>.tpr</code>, <code>.itp</code>, <code>.top</code></li>
+                            <li>Binary file support via MDAnalysis, Chemfiles, OVITO</li>
+                            <li>Automatic residue detection from <code>.gro</code>/<code>.pdb</code>/<code>.tpr</code>/<code>.itp</code></li>
+                            <li><code>--t_steps</code> maps to GROMACS <code>-dt</code> flag</li>
+                        </ul>
+                    </article>
+                    <article class="engine-card lammps">
+                        <div class="engine-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                        </div>
+                        <h3>LAMMPS</h3>
+                        <ul class="feature-list">
+                            <li>Trajectory formats: <code>.lammpstrj</code>, <code>.xtc</code>, <code>.dcd</code></li>
+                            <li>Data files: <code>.data</code>, <code>.in</code></li>
+                            <li><code>--t_steps</code> = LAMMPS timestep; <code>--dump_frame</code> = dump frequency</li>
+                            <li>MDTransport computes <code>dt = t_steps × dump_frame</code></li>
+                            <li>Species identification via atom types or molecule IDs</li>
+                        </ul>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="feature-section bg-muted">
+            <div class="container">
+                <h2 class="section-title">Transport Properties Computed</h2>
+                <div class="properties-grid">
+                    <article class="property-card">
+                        <header class="property-header">
+                            <span class="property-flag">--msd</span>
+                            <h3>Self-Diffusion Coefficients</h3>
+                        </header>
+                        <ul>
+                            <li>COM-based MSD for each molecule (Eq. 1–4)</li>
+                            <li>Direction-specific: <code>--dir x</code>, <code>--dir x y</code>, or 3D (default)</li>
+                            <li>Per-species: <code>--resname</code> flag</li>
+                            <li>Intramolecular fragments: <code>--msd_mode --msd_species</code></li>
+                            <li>FFT-accelerated autocorrelation</li>
+                            <li>Adaptive fitting for diffusion regime</li>
+                            <li>Uncertainty via block averaging, time-window variation</li>
+                        </ul>
+                    </article>
+                    <article class="property-card">
+                        <header class="property-header">
+                            <span class="property-flag">--ne</span>
+                            <h3>Nernst-Einstein Conductivity</h3>
+                        </header>
+                        <ul>
+                            <li>σ<sub>NE</sub> = (1/Vk<sub>B</sub>T) Σ N<sub>i</sub>z<sub>i</sub><sup>2</sup>D<sub>i</sub> (Eq. 6)</li>
+                            <li>Ideal conductivity (no ion-ion correlations)</li>
+                            <li>Uses self-diffusion coefficients from MSD</li>
+                            <li>Quick screening for correlation effects</li>
+                        </ul>
+                    </article>
+                    <article class="property-card">
+                        <header class="property-header">
+                            <span class="property-flag">--corr</span>
+                            <h3>Einstein Ionic Conductivity</h3>
+                        </header>
+                        <ul>
+                            <li>Full Einstein formalism (Eq. 7)</li>
+                            <li>Self- and cross-correlation decomposition (Eq. 8)</li>
+                            <li>Intercomponent (C–A) & intracomponent (C–C, A–A)</li>
+                            <li>Slope over first 1 ns (configurable: <code>--min_window</code>)</li>
+                            <li>Multiple time origins for averaging</li>
+                        </ul>
+                    </article>
+                    <article class="property-card">
+                        <header class="property-header">
+                            <span class="property-flag">--corr --eh</span>
+                            <h3>Einstein-Helfand Conductivity</h3>
+                        </header>
+                        <ul>
+                            <li>Dipole moment of entire species (bypasses pairwise sum)</li>
+                            <li>Orders of magnitude faster for large systems</li>
+                            <li>Enables full trajectory sliding windows</li>
+                            <li>Identical results to standard Einstein</li>
+                        </ul>
+                    </article>
+                    <article class="property-card">
+                        <header class="property-header">
+                            <span class="property-flag">--spda</span>
+                            <h3>Spatial Decomposition (SPDA)</h3>
+                        </header>
+                        <ul>
+                            <li>σ<sub>proximal</sub> (r < r<sub>cut</sub>) & σ<sub>distant</sub> (r > r<sub>cut</sub>) (Eq. 16–17)</li>
+                            <li>Auto r<sub>cut</sub> from 2nd RDF minimum</li>
+                            <li>Manual override: <code>--shell</code> or <code>--rcut</code></li>
+                            <li>Three ion subsets: inside, outside, jumping</li>
+                            <li>Molecular-level insight for electrolyte design</li>
+                        </ul>
+                    </article>
+                    <article class="property-card">
+                        <header class="property-header">
+                            <span class="property-flag">--onsg</span>
+                            <h3>Onsager Transport Coefficients</h3>
+                        </header>
+                        <ul>
+                            <li>Cross-species transport coefficients L<sub>ij</sub></li>
+                            <li>Standard Einstein & EH formalism (<code>--onsg --eh</code>)</li>
+                            <li>EH: collective displacement variables</li>
+                            <li>Full trajectory windows feasible with EH</li>
+                        </ul>
+                    </article>
+                    <article class="property-card">
+                        <header class="property-header">
+                            <span class="property-flag">--corr</span>
+                            <h3>Transference Numbers</h3>
+                        </header>
+                        <ul>
+                            <li>Ideal: t<sub>i</sub><sup>ideal</sup> = N<sub>i</sub>z<sub>i</sub><sup>2</sup>D<sub>i</sub> / Σ (Eq. 23)</li>
+                            <li>Real: includes self + cross correlations (Eq. 24)</li>
+                            <li>Computed alongside Einstein conductivity</li>
+                        </ul>
+                    </article>
+                    <article class="property-card">
+                        <header class="property-header">
+                            <span class="property-flag">--sm</span>
+                            <h3>Stefan-Maxwell Diffusivity</h3>
+                        </header>
+                        <ul>
+                            <li>D<sub>ij</sub> for species pairs (Eq. 25)</li>
+                            <li>COM displacement differences</li>
+                            <li>Multicomponent diffusion analysis</li>
+                        </ul>
+                    </article>
+                    <article class="property-card">
+                        <header class="property-header">
+                            <span class="property-flag">--cage</span>
+                            <h3>Cage Correlation Lifetimes</h3>
+                        </header>
+                        <ul>
+                            <li>Heaviside function tracking (Eq. 28)</li>
+                            <li>Cage = 1st solvation shell from RDF</li>
+                            <li>Reformation allowed: h(t) can return to 1</li>
+                            <li>τ<sub>cage</sub> via integration or 3-exponential fit (Eq. 30–31)</li>
+                            <li>Requires <code>--ref_species --cage_species</code></li>
+                        </ul>
+                    </article>
+                    <article class="property-card">
+                        <header class="property-header">
+                            <span class="property-flag">--pair</span>
+                            <h3>Pair Correlation Lifetimes</h3>
+                        </header>
+                        <ul>
+                            <li>Nearest-neighbor tracking (Eq. 32)</li>
+                            <li>Heaviside step function</li>
+                            <li>Reformation allowed</li>
+                            <li>3-exponential fit for τ<sub>pair</sub></li>
+                            <li>Requires <code>--ref_species --pair_species</code></li>
+                        </ul>
+                    </article>
+                    <article class="property-card">
+                        <header class="property-header">
+                            <span class="property-flag">--cluster</span>
+                            <h3>Cluster Analysis</h3>
+                        </header>
+                        <ul>
+                            <li>Ion clustering statistics</li>
+                            <li>Cluster size distributions</li>
+                            <li>Percolation analysis</li>
+                        </ul>
+                    </article>
+                    <article class="property-card">
+                        <header class="property-header">
+                            <span class="property-flag">--rdf</span>
+                            <h3>Radial Distribution Functions</h3>
+                        </header>
+                        <ul>
+                            <li>COM-COM (default), atom-atom, atom-COM</li>
+                            <li>Standard formula (Eq. 37)</li>
+                            <li>Targeted pairs: <code>--resname EMI BF</code></li>
+                            <li>Custom sites: <code>--rdf_mode --rdf_pairs</code></li>
+                            <li>Auto-analysis: <code>--ana</code> (peaks, coordination number, shell radii)</li>
+                        </ul>
+                    </article>
+                    <article class="property-card">
+                        <header class="property-header">
+                            <span class="property-flag">--mech</span>
+                            <h3>Transport Mechanism</h3>
+                        </header>
+                        <ul>
+                            <li>Ion transport mechanism classification</li>
+                            <li>Vehicle vs. structural diffusion</li>
+                            <li>Hopping analysis</li>
+                        </ul>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="feature-section">
+            <div class="container">
+                <h2 class="section-title">Three Interfaces</h2>
+                <div class="interfaces-grid">
+                    <article class="interface-card">
+                        <div class="interface-icon cli">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
+                        </div>
+                        <h3>Prompt-Based CLI</h3>
+                        <p class="interface-desc">Designed for HPC environments. Stepwise prompts guide new users; experts use single-command flags.</p>
+                        <div class="interface-example">
+                            <code>$ mdt</code>
+                            <code>> Select analysis: 1) MSD 2) Conductivity 3) RDF...</code>
+                            <code>> Enter trajectory file: traj.xtc</code>
+                            <code>> Enter topology: topol.tpr</code>
+                            <code>> Time step (ps): 20</code>
+                        </div>
+                        <ul class="feature-list">
+                            <li>Interactive prompts with validation</li>
+                            <li>All flags available for scripting: <code>mdt --msd --corr -t traj.xtc ...</code></li>
+                            <li>Help: <code>mdt -h</code> | Examples: <code>mdt -e</code></li>
+                        </ul>
+                    </article>
+                    <article class="interface-card">
+                        <div class="interface-icon desktop">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"></rect><path d="M8 21h8"></path><path d="M12 17v4"></path></svg>
+                        </div>
+                        <h3>Desktop Application</h3>
+                        <p class="interface-desc">Cross-platform GUI for local execution. Same engine, visual workflow builder.</p>
+                        <ul class="feature-list">
+                            <li>Visual parameter configuration</li>
+                            <li>Real-time progress monitoring</li>
+                            <li>Plot preview and export</li>
+                            <li>Available at <a href="https://shahresearchgroup.org" target="_blank">shahresearchgroup.org</a></li>
+                        </ul>
+                    </article>
+                    <article class="interface-card">
+                        <div class="interface-icon web">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                        </div>
+                        <h3>Web Interface</h3>
+                        <p class="interface-desc">Browser-based analysis — upload trajectories, configure analysis, download results.</p>
+                        <ul class="feature-list">
+                            <li>No installation required</li>
+                            <li>Cloud compute or local browser processing</li>
+                            <li>Session persistence</li>
+                            <li>Available at <a href="https://shahresearchgroup.org" target="_blank">shahresearchgroup.org</a></li>
+                        </ul>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="feature-section bg-muted">
+            <div class="container">
+                <h2 class="section-title">Advanced Computational Features</h2>
+                <div class="advanced-grid">
+                    <article class="advanced-card">
+                        <h3>Adaptive Fitting</h3>
+                        <p>Automated detection of diffusive regime reduces user bias in time-window selection for MSD and conductivity slope calculations.</p>
+                    </article>
+                    <article class="advanced-card">
+                        <h3>Multi-Tool Backend</h3>
+                        <p>Switch between MDAnalysis, Chemfiles, OVITO, or native GROMACS/LAMMPS via flags: <code>--mda</code>, <code>--chem</code>, <code>--ovito</code>, <code>--exe</code>. Binary format support without conversion.</p>
+                    </article>
+                    <article class="advanced-card">
+                        <h3>Disk-Backed Processing</h3>
+                        <p><code>--disk</code> flag streams intermediate data to disk, reducing peak memory ~50% for large systems. Trade-off: I/O overhead on HDD.</p>
+                    </article>
+                    <article class="advanced-card">
+                        <h3>Multiprocessing</h3>
+                        <p>Uses all cores by default. Control via <code>--n_cores</code> and <code>--mp_mode</code> (spawn/fork/forkserver). Optimized for resource-constrained environments.</p>
+                    </article>
+                    <article class="advanced-card">
+                        <h3>PBC Handling</h3>
+                        <p>Two-step: (1) minimum-image reconstruction of fragmented molecules, (2) displacement correction for boundary-crossing jumps.</p>
+                    </article>
+                    <article class="advanced-card">
+                        <h3>Selective COM Extraction</h3>
+                        <p>Atomic coordinates for RDF/MSD of fragments; COM for bulk properties. Flags: <code>--pdb</code>, <code>--lamp</code>, <code>--exe</code>, <code>--mda</code>, <code>--chem</code>, <code>--ovito</code>.</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="feature-section">
+            <div class="container">
+                <h2 class="section-title">Output & Visualization</h2>
+                <div class="output-grid">
+                    <div class="output-card">
+                        <h3>Data Files</h3>
+                        <ul>
+                            <li>CSV/TSV for all computed properties</li>
+                            <li>MSD vs time, conductivity vs time</li>
+                            <li>RDF curves (g(r) vs r)</li>
+                            <li>Correlation functions</li>
+                            <li>Cluster size distributions</li>
+                            <li>Lifetime distributions</li>
+                        </ul>
+                    </div>
+                    <div class="output-card">
+                        <h3>Plots (matplotlib)</h3>
+                        <ul>
+                            <li>MSD with linear fit region highlighted</li>
+                            <li>Conductivity convergence plots</li>
+                            <li>Ion-ion correlation breakdown</li>
+                            <li>SPDA: σ<sub>proximal</sub> vs σ<sub>distant</sub></li>
+                            <li>RDF with peaks/coordination numbers</li>
+                            <li>Cage/pair correlation decay curves</li>
+                        </ul>
+                    </div>
+                    <div class="output-card">
+                        <h3>Log & Summary</h3>
+                        <ul>
+                            <li>Detailed execution log</li>
+                            <li>Parameter summary for reproducibility</li>
+                            <li>Error/warning diagnostics</li>
+                            <li>Performance metrics</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-links">
+                    <a href="index.html">Overview</a>
+                    <a href="features.html">Features</a>
+                    <a href="theory.html">Theory</a>
+                    <a href="installation.html">Installation</a>
+                    <a href="performance.html">Performance</a>
+                    <a href="references.html">References</a>
+                </div>
+                <p class="footer-license">Licensed under GNU GPL v3.0 · © 2026 The Authors</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

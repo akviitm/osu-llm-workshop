@@ -1,0 +1,614 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Molecular Dynamics Fundamentals for Ionic Liquids</title>
+<style>
+:root {
+  --banner-bg: #e86c00;
+  --banner-text: #fff;
+  --primary: #2c3e50;
+  --accent: #1a73e8;
+  --accent-hover: #155ab6;
+  --bg: #fafafa;
+  --card-bg: #fff;
+  --border: #e0e0e0;
+  --text: #222;
+  --muted: #666;
+  --socratic-bg: #f0f7ff;
+  --socratic-border: #1a73e8;
+  --code-bg: #1e1e1e;
+  --code-text: #d4d4d4;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --banner-bg: #ff8c00;
+    --banner-text: #000;
+    --primary: #e0e0e0;
+    --accent: #64b5f6;
+    --accent-hover: #90caf9;
+    --bg: #121212;
+    --card-bg: #1e1e1e;
+    --border: #333;
+    --text: #e0e0e0;
+    --muted: #aaa;
+    --socratic-bg: #0d1b2a;
+    --socratic-border: #64b5f6;
+    --code-bg: #1e1e1e;
+    --code-text: #d4d4d4;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 1rem 3rem;
+  line-height: 1.6;
+  background: var(--bg);
+  color: var(--text);
+  transition: background 0.3s, color 0.3s;
+}
+.banner {
+  background: var(--banner-bg);
+  color: var(--banner-text);
+  padding: 1rem 1.5rem;
+  margin: 0 -1rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+.banner h1 { margin: 0; font-size: 1.25rem; font-weight: 600; }
+.banner-actions { display: flex; gap: 0.5rem; align-items: center; }
+.banner-btn {
+  background: rgba(255,255,255,0.2);
+  border: 1px solid rgba(255,255,255,0.4);
+  color: var(--banner-text);
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: background 0.2s, transform 0.1s;
+}
+.banner-btn:hover { background: rgba(255,255,255,0.3); }
+.banner-btn:active { transform: scale(0.98); }
+.banner-progress {
+  background: rgba(0,0,0,0.2);
+  border-radius: 999px;
+  height: 8px;
+  width: 120px;
+  overflow: hidden;
+}
+.banner-progress::before {
+  content: attr(data-label);
+  position: absolute;
+  left: -80px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.7rem;
+  white-space: nowrap;
+  opacity: 0.9;
+}
+.banner-progress-fill {
+  background: var(--banner-text);
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.5s ease;
+  width: 0%;
+}
+h1 { border-bottom: 2px solid var(--primary); padding-bottom: 0.5rem; color: var(--primary); margin-top: 0; }
+nav {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+nav a {
+  display: inline-block;
+  margin: 0.5rem 1rem 0.5rem 0;
+  text-decoration: none;
+  color: var(--primary);
+  font-weight: 500;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  transition: background 0.2s, color 0.2s, transform 0.1s;
+}
+nav a:hover { background: var(--socratic-bg); color: var(--accent-hover); transform: translateX(4px); }
+section { margin: 2rem 0; }
+.socratic {
+  border-left: 4px solid var(--socratic-border);
+  padding: 1rem 1.25rem;
+  margin: 1.5rem 0;
+  background: var(--socratic-bg);
+  border-radius: 0 10px 10px 0;
+  position: relative;
+}
+.socratic::before {
+  content: "💡 Check your understanding";
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--socratic-border);
+  margin-bottom: 0.5rem;
+}
+.socratic p { margin: 0; }
+table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+th, td { padding: 0.75rem; border-bottom: 1px solid var(--border); text-align: left; }
+th { background: var(--primary); color: #fff; font-weight: 600; }
+tr:hover td { background: var(--socratic-bg); }
+pre { background: var(--code-bg); color: var(--code-text); padding: 1rem; border-radius: 10px; overflow-x: auto; margin: 1rem 0; }
+code { font-family: 'Monaco', 'Menlo', 'Consolas', monospace; font-size: 0.9em; }
+details { background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; margin: 1rem 0; overflow: hidden; }
+summary { padding: 1rem 1.25rem; cursor: pointer; font-weight: 600; list-style: none; display: flex; align-items: center; gap: 0.5rem; }
+summary::-webkit-details-marker { display: none; }
+summary::after { content: "▶"; font-size: 0.7rem; color: var(--muted); transition: transform 0.2s; margin-left: auto; }
+details[open] summary::after { transform: rotate(90deg); }
+details[open] summary { border-bottom: 1px solid var(--border); }
+details > div { padding: 1rem 1.25rem; }
+progress { width: 100%; height: 10px; border-radius: 5px; appearance: none; }
+progress::-webkit-progress-bar { background: var(--border); border-radius: 5px; }
+progress::-webkit-progress-value { background: var(--accent); border-radius: 5px; }
+progress::-moz-progress-bar { background: var(--accent); border-radius: 5px; }
+.checklist { list-style: none; padding: 0; margin: 1rem 0; }
+.checklist li {
+  display: flex; align-items: flex-start; gap: 0.75rem;
+  padding: 0.75rem; background: var(--card-bg); border: 1px solid var(--border);
+  border-radius: 8px; margin: 0.5rem 0; transition: all 0.2s;
+}
+.checklist li:hover { border-color: var(--accent); transform: translateX(4px); }
+.checklist input[type="checkbox"] { width: 1.1rem; height: 1.1rem; accent-color: var(--accent); flex-shrink: 0; margin-top: 0.15rem; }
+.checklist label { cursor: pointer; flex: 1; }
+.tooltip { position: relative; border-bottom: 1px dotted var(--muted); cursor: help; }
+.tooltip::after {
+  content: attr(data-tip);
+  position: absolute; bottom: 125%; left: 50%; transform: translateX(-50%);
+  background: var(--primary); color: #fff; padding: 0.5rem 0.75rem;
+  border-radius: 6px; font-size: 0.8rem; white-space: nowrap;
+  opacity: 0; visibility: hidden; transition: all 0.2s; pointer-events: none; z-index: 10;
+}
+.tooltip:hover::after { opacity: 1; visibility: visible; }
+.accordion-group { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin: 1rem 0; }
+.accordion-group details { border: none; border-radius: 0; margin: 0; }
+.accordion-group summary { border-bottom: 1px solid var(--border); }
+.accordion-group details:last-child summary { border-bottom: none; }
+.interactive-demo { background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem; margin: 1.5rem 0; }
+.interactive-demo h3 { margin-top: 0; color: var(--primary); }
+.demo-controls { display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 1rem 0; }
+.demo-btn {
+  background: var(--accent); color: #fff; border: none; padding: 0.5rem 1rem;
+  border-radius: 6px; cursor: pointer; font-weight: 500; transition: all 0.2s;
+}
+.demo-btn:hover { background: var(--accent-hover); transform: translateY(-1px); }
+.demo-btn:active { transform: translateY(0); }
+.demo-btn.secondary { background: var(--muted); }
+.demo-output { background: var(--code-bg); color: var(--code-text); padding: 1rem; border-radius: 8px; min-height: 60px; font-family: monospace; white-space: pre-wrap; overflow-x: auto; }
+.footer-note { text-align: center; color: var(--muted); font-size: 0.85rem; margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+@media (max-width: 600px) {
+  .banner { margin: 0 -1rem 1.5rem; padding: 1rem; }
+  .banner h1 { font-size: 1.1rem; }
+  .banner-progress { width: 80px; }
+  .banner-progress::before { display: none; }
+  nav a { display: block; margin: 0.5rem 0; }
+}
+</style>
+</head>
+<body>
+<div class="banner" role="banner">
+  <h1>📐 Lesson 1: Molecular Dynamics Fundamentals for Ionic Liquids</h1>
+  <div class="banner-actions">
+    <div class="banner-progress" data-label="Progress" id="courseProgress">
+      <div class="banner-progress-fill" id="progressFill"></div>
+    </div>
+    <button class="banner-btn" id="themeToggle" aria-label="Toggle theme">🌙</button>
+    <button class="banner-btn" id="tocToggle" aria-label="Show table of contents">📋</button>
+  </div>
+</div>
+
+<h1>1. Molecular Dynamics Fundamentals for Ionic Liquids</h1>
+
+<nav>
+  <a href="index.html">← Course Home</a>
+  <a href="advanced-topics.html">Advanced Topics →</a>
+  <a href="mdtransport-performance.html">MDTransport Performance →</a>
+</nav>
+
+<section>
+  <h2>System Preparation</h2>
+  <p>Building an ionic liquid simulation box requires careful attention to charge neutrality and initial packing:</p>
+
+  <div class="accordion-group">
+    <details open>
+      <summary>🔧 Step-by-Step Workflow</summary>
+      <div>
+        <ol>
+          <li><strong>Generate ion pairs:</strong> Start with a single cation–anion pair at a reasonable separation (0.5–0.7 nm).</li>
+          <li><strong>Replicate:</strong> Use <code>gmx genconf</code> or <code>packmol</code> to create a box with ~500–2000 ion pairs.</li>
+          <li><strong>Energy minimize:</strong> Steepest descent until max force &lt; 100 kJ/mol/nm.</li>
+          <li><strong>Equilibrate:</strong> NVT (1–5 ns) then NPT (5–20 ns) at target T and P.</li>
+        </ol>
+      </div>
+    </details>
+    <details>
+      <summary>💻 Example GROMACS Commands</summary>
+      <div>
+        <pre><code># Example GROMACS workflow
+gmx grompp -f minim.mdp -c il_box.gro -p topol.top -o min.tpr
+gmx mdrun -deffnm min
+gmx grompp -f nvt.mdp -c min.gro -p topol.top -o nvt.tpr
+gmx mdrun -deffnm nvt
+gmx grompp -f npt.mdp -c nvt.gro -p topol.top -o npt.tpr
+gmx mdrun -deffnm npt</code></pre>
+      </div>
+    </details>
+  </div>
+
+  <div class="interactive-demo">
+    <h3>⚙️ Interactive: Box Size Calculator</h3>
+    <p>Calculate the simulation box dimensions needed for a given number of ion pairs and target density:</p>
+    <div class="demo-controls">
+      <label>Number of ion pairs: <input type="number" id="numPairs" value="1000" min="100" max="5000" step="100"></label>
+      <label>Target density (g/cm³): <input type="number" id="targetDensity" value="1.4" min="1.0" max="2.0" step="0.05"></label>
+      <label>Molar mass per ion pair (g/mol): <input type="number" id="molarMass" value="400" min="200" max="800" step="10"></label>
+    </div>
+    <button class="demo-btn" onclick="calculateBox()">Calculate Box Dimensions</button>
+    <div class="demo-output" id="boxOutput">Enter values and click calculate...</div>
+  </div>
+</section>
+
+<section>
+  <h2>Electrostatics: The Critical Choice</h2>
+  <p>For ionic liquids, electrostatic treatment dominates accuracy and cost:</p>
+
+  <div class="accordion-group">
+    <details open>
+      <summary>📊 Electrostatics Method Comparison</summary>
+      <div>
+        <table>
+          <tr style="background:var(--primary); color:white;">
+            <th style="padding:0.5rem;">Method</th>
+            <th style="padding:0.5rem;">Cost</th>
+            <th style="padding:0.5rem;">Suitability for ILs</th>
+          </tr>
+          <tr>
+            <td style="padding:0.5rem; border-bottom:1px solid var(--border);">Cutoff (plain)</td>
+            <td style="padding:0.5rem; border-bottom:1px solid var(--border);">Low</td>
+            <td style="padding:0.5rem; border-bottom:1px solid var(--border);">❌ Unacceptable—misses long-range order</td>
+          </tr>
+          <tr>
+            <td style="padding:0.5rem; border-bottom:1px solid var(--border);">Reaction field</td>
+            <td style="padding:0.5rem; border-bottom:1px solid var(--border);">Low</td>
+            <td style="padding:0.5rem; border-bottom:1px solid var(--border);">⚠️ Poor for charge-ordered systems</td>
+          </tr>
+          <tr>
+            <td style="padding:0.5rem; border-bottom:1px solid var(--border);">PME (Particle Mesh Ewald)</td>
+            <td style="padding:0.5rem; border-bottom:1px solid var(--border);">Medium</td>
+            <td style="padding:0.5rem; border-bottom:1px solid var(--border);">✅ Standard choice</td>
+          </tr>
+          <tr>
+            <td style="padding:0.5rem;">PPPM / Ewald</td>
+            <td style="padding:0.5rem;">High</td>
+            <td style="padding:0.5rem;">✅ Accurate, for validation</td>
+          </tr>
+        </table>
+      </div>
+    </details>
+  </div>
+
+  <p>For PME: use a real-space cutoff of 1.0–1.2 nm, Fourier spacing ≤ 0.12 nm, and interpolation order 4–6. Verify energy conservation in NVE after equilibration.</p>
+
+  <div class="interactive-demo">
+    <h3>🔬 Interactive: PME Parameter Explorer</h3>
+    <p>Explore how PME parameters affect accuracy and performance:</p>
+    <div class="demo-controls">
+      <label>Real-space cutoff (nm): <input type="range" id="rcut" min="0.8" max="1.5" value="1.0" step="0.1" oninput="document.getElementById('rcutVal').textContent=this.value"><span id="rcutVal">1.0</span></label>
+      <label>Fourier spacing (nm): <input type="range" id="fourier" min="0.08" max="0.2" value="0.12" step="0.01" oninput="document.getElementById('fourierVal').textContent=this.value"><span id="fourierVal">0.12</span></label>
+      <label>Interpolation order: <input type="range" id="order" min="4" max="6" value="4" step="1" oninput="document.getElementById('orderVal').textContent=this.value"><span id="orderVal">4</span></label>
+    </div>
+    <button class="demo-btn" onclick="estimatePME()">Estimate Accuracy &amp; Cost</button>
+    <div class="demo-output" id="pmeOutput">Adjust sliders and click estimate...</div>
+  </div>
+</section>
+
+<div class="socratic" data-question="pme-params">
+  <p>If you double the box size while keeping the same number of ion pairs, how should you adjust the PME Fourier spacing and why?</p>
+</div>
+
+<section>
+  <h2>Thermostats and Barostats</h2>
+  <p>Ionic liquids have slow momentum and energy relaxation. Recommended choices:</p>
+
+  <div class="accordion-group">
+    <details open>
+      <summary>🌡️ Thermostat &amp; Barostat Settings</summary>
+      <div>
+        <ul>
+          <li><strong>Thermostat:</strong> Nosé–Hoover chains (NHC) with τ<sub>T</sub> = 1–2 ps. Avoid velocity rescaling (Berendsen) for production—it suppresses fluctuations.</li>
+          <li><strong>Barostat:</strong> Parrinello–Rahman with τ<sub>P</sub> = 5–10 ps, compressibility 4.5×10<sup>−5</sup> bar<sup>−1</sup> (typical for ILs). Isotropic for bulk; semi-isotropic if studying interfaces.</li>
+        </ul>
+        <p>For NVT equilibration before NPT, a weaker coupling (τ<sub>T</sub> = 0.5 ps) helps reach target T quickly.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="interactive-demo">
+    <h3>⚙️ Interactive: Thermostat/Barostat Config Generator</h3>
+    <p>Generate GROMACS .mdp snippets for your ensemble:</p>
+    <div class="demo-controls">
+      <label>Ensemble: <select id="ensemble"><option value="nvt">NVT</option><option value="npt">NPT</option></select></label>
+      <label>τ<sub>T</sub> (ps): <input type="number" id="tauT" value="1.0" min="0.1" max="5" step="0.1"></label>
+      <label>τ<sub>P</sub> (ps): <input type="number" id="tauP" value="10.0" min="1" max="20" step="1"></label>
+    </div>
+    <button class="demo-btn" onclick="generateMDP()">Generate MDP Snippet</button>
+    <div class="demo-output" id="mdpOutput">Select ensemble and click generate...</div>
+  </div>
+</section>
+
+<div class="socratic" data-question="thermostat-choice">
+  <p>Why is Nosé–Hoover preferred over Berendsen for production runs of ionic liquids, and what specific artifact would Berendsen introduce in the computed ionic conductivity?</p>
+</div>
+
+<section>
+  <h2>Time Step and Constraints</h2>
+
+  <div class="accordion-group">
+    <details open>
+      <summary>⏱️ Time Step Recommendations</summary>
+      <div>
+        <ul>
+          <li><strong>Time step:</strong> 2 fs with <code>constraints = h-bonds</code> (LINCS/SETTLE). For flexible IL models with explicit H, 1 fs may be needed.</li>
+          <li><strong>Constraints:</strong> Constrain all bonds involving hydrogen. For rigid ion models (e.g., some coarse-grained), constrain all bonds.</li>
+          <li><strong>LINCS order:</strong> 4–6; iterations = 1 (standard) or 2 (high accuracy).</li>
+        </ul>
+      </div>
+    </details>
+    <details>
+      <summary>💻 Production MDP Example</summary>
+      <div>
+        <pre><code>; Example mdp snippet for production
+dt                   = 0.002
+constraints          = h-bonds
+constraint_algorithm = lincs
+lincs_order          = 4
+lincs_iter           = 1
+nstxout-compressed   = 5000   ; write compressed coords every 10 ps
+nstenergy            = 1000   ; write energies every 2 ps
+nstlog               = 1000</code></pre>
+      </div>
+    </details>
+  </div>
+
+  <div class="interactive-demo">
+    <h3>⚡ Interactive: Time Step Stability Checker</h3>
+    <p>Estimate maximum stable time step for your ionic liquid model:</p>
+    <div class="demo-controls">
+      <label>Model type: <select id="modelType"><option value="flexible">Flexible (explicit H)</option><option value="rigid">Rigid (constrained H)</option><option value="coarse">Coarse-grained</option></select></label>
+      <label>Highest vibrational frequency (cm⁻¹): <input type="number" id="vibFreq" value="3000" min="1000" max="4000" step="100"></label>
+      <label>Constraint algorithm: <select id="constraintAlgo"><option value="lincs">LINCS</option><option value="settle">SETTLE (water)</option></select></label>
+    </div>
+    <button class="demo-btn" onclick="checkTimestep()">Check Stability</button>
+    <div class="demo-output" id="timestepOutput">Select options and click check...</div>
+  </div>
+</section>
+
+<div class="socratic" data-question="timestep-tradeoff">
+  <p>A colleague suggests using a 4 fs time step with virtual sites on all hydrogens to speed up your ionic liquid simulation. What property would you check first to validate this choice, and why might it be riskier for ILs than for water?</p>
+</div>
+
+<section>
+  <h2>Convergence and Sampling</h2>
+  <p>Typical production runs for ionic liquids:</p>
+
+  <div class="accordion-group">
+    <details open>
+      <summary>📈 Recommended Run Lengths</summary>
+      <div>
+        <ul>
+          <li><strong>Structural properties</strong> (RDFs, density): 20–50 ns</li>
+          <li><strong>Dynamical properties</strong> (diffusion, conductivity): 100–500 ns</li>
+          <li><strong>Slow processes</strong> (domain rearrangement, glassy dynamics): &gt;1 μs</li>
+        </ul>
+        <p>Run multiple independent replicas (3–5) with different initial velocities to assess statistical uncertainty.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="interactive-demo">
+    <h3>📊 Interactive: Convergence Planner</h3>
+    <p>Plan your simulation campaign based on target properties:</p>
+    <div class="demo-controls">
+      <label>Target property: <select id="targetProp"><option value="structure">Structure (RDF, density)</option><option value="diffusion">Self-diffusion</option><option value="conductivity">Ionic conductivity</option><option value="viscosity">Viscosity</option><option value="slow">Slow dynamics (domains)</option></select></label>
+      <label>Available compute (GPU-days): <input type="number" id="computeBudget" value="10" min="1" max="100" step="1"></label>
+      <label>Number of replicas: <input type="number" id="numReplicas" value="3" min="1" max="10" step="1"></label>
+    </div>
+    <button class="demo-btn" onclick="planConvergence()">Plan Campaign</button>
+    <div class="demo-output" id="convergenceOutput">Select target and click plan...</div>
+  </div>
+</section>
+
+<div class="socratic" data-question="convergence-check">
+  <p>You run a 100 ns simulation of [C<sub>4</sub>mim][NTf<sub>2</sub>] and the cation–anion RDF appears converged. Why might the ionic conductivity still be far from converged, and what analysis would you run to check?</p>
+</div>
+
+<footer class="footer-note">
+  <p>Part of the OSU LLM Workshop series. <a href="index.html">← Course Home</a> | <a href="advanced-topics.html">Advanced Topics →</a></p>
+</footer>
+
+<div id="tocPanel" style="display:none; position:fixed; top:80px; right:1rem; width:280px; max-height:70vh; overflow:auto; background:var(--card-bg); border:1px solid var(--border); border-radius:10px; padding:1rem; box-shadow:0 4px 20px rgba(0,0,0,0.2); z-index:100;">
+  <h3 style="margin-top:0;">📑 Table of Contents</h3>
+  <nav id="tocNav"></nav>
+  <button class="demo-btn secondary" style="width:100%; margin-top:1rem;" onclick="document.getElementById('tocPanel').style.display='none'">Close</button>
+</div>
+
+<script>
+(function() {
+  'use strict';
+  const STORAGE_KEY = 'il-course-progress';
+  const THEME_KEY = 'il-course-theme';
+
+  const themeToggle = document.getElementById('themeToggle');
+  function applyTheme(theme) {
+    if (theme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    else document.documentElement.removeAttribute('data-theme');
+    themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
+  }
+  const savedTheme = localStorage.getItem(THEME_KEY) || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  applyTheme(savedTheme);
+  themeToggle.addEventListener('click', () => {
+    const newTheme = document.documentElement.hasAttribute('data-theme') ? 'light' : 'dark';
+    localStorage.setItem(THEME_KEY, newTheme);
+    applyTheme(newTheme);
+  });
+
+  function loadProgress() { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{"visited":[], "checks":{}}'); }
+  function saveProgress(p) { localStorage.setItem(STORAGE_KEY, JSON.stringify(p)); }
+  function updateProgressUI() {
+    const p = loadProgress();
+    const pages = ['index.html', 'molecular-dynamics.html', 'advanced-topics.html'];
+    const currentPage = location.pathname.split('/').pop() || 'index.html';
+    if (!p.visited.includes(currentPage)) { p.visited.push(currentPage); saveProgress(p); }
+    const visitedCount = pages.filter(pg => p.visited.includes(pg)).length;
+    const pct = Math.round((visitedCount / pages.length) * 100);
+    const fill = document.getElementById('progressFill');
+    if (fill) fill.style.width = pct + '%';
+  }
+
+  function buildTOC() {
+    const nav = document.getElementById('tocNav');
+    const headings = document.querySelectorAll('h2, h3');
+    headings.forEach(h => {
+      if (!h.id) h.id = h.textContent.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      const a = document.createElement('a');
+      a.href = '#' + h.id;
+      a.textContent = h.textContent;
+      a.style.display = 'block';
+      a.style.padding = '0.3rem 0';
+      a.style.color = 'var(--text)';
+      a.style.textDecoration = 'none';
+      a.style.borderBottom = '1px solid var(--border)';
+      a.onclick = () => document.getElementById('tocPanel').style.display = 'none';
+      nav.appendChild(a);
+    });
+  }
+
+  // Interactive demos
+  window.calculateBox = function() {
+    const n = parseInt(document.getElementById('numPairs').value);
+    const rho = parseFloat(document.getElementById('targetDensity').value);
+    const M = parseFloat(document.getElementById('molarMass').value);
+    const NA = 6.02214076e23;
+    const volumeNm3 = (n * M / rho) / NA * 1e24; // nm³
+    const boxL = Math.cbrt(volumeNm3);
+    document.getElementById('boxOutput').textContent =
+      `📦 Box volume: ${volumeNm3.toFixed(1)} nm³\n` +
+      `📐 Cubic box length: ${boxL.toFixed(2)} nm\n` +
+      `💡 For rectangular boxes, adjust proportions based on system geometry.`;
+  };
+
+  window.estimatePME = function() {
+    const rcut = parseFloat(document.getElementById('rcut').value);
+    const fourier = parseFloat(document.getElementById('fourier').value);
+    const order = parseInt(document.getElementById('order').value);
+    let accuracy = 'High';
+    if (fourier > 0.15) accuracy = 'Medium';
+    if (fourier > 0.18 || rcut < 0.9) accuracy = 'Low';
+    const costFactor = (1/fourier)**3 * (order/4);
+    document.getElementById('pmeOutput').textContent =
+      `🎯 Estimated accuracy: ${accuracy}\n` +
+      `⚡ Relative cost factor: ${costFactor.toFixed(1)}×\n` +
+      `📝 Notes:\n` +
+      `  - Real-space cutoff ${rcut} nm: ${rcut >= 1.0 ? 'Good' : '⚠️ May miss interactions'}\n` +
+      `  - Fourier spacing ${fourier} nm: ${fourier <= 0.12 ? 'Good' : '⚠️ Coarse grid'}\n` +
+      `  - Order ${order}: ${order >= 4 ? 'Standard' : 'Low'}\n\n` +
+      `💡 Always verify with NVE energy conservation test!`;
+  };
+
+  window.generateMDP = function() {
+    const ens = document.getElementById('ensemble').value;
+    const tauT = document.getElementById('tauT').value;
+    const tauP = document.getElementById('tauP').value;
+    let out = `; Generated ${ens.toUpperCase()} settings\n`;
+    out += `tcoupl           = v-rescale          ; or nose-hoover for production\n`;
+    out += `tc-grps          = System\n`;
+    out += `tau-t            = ${tauT}\n`;
+    if (ens === 'npt') {
+      out += `pcoupl           = parrinello-rahman\n`;
+      out += `pcoupltype       = isotropic\n`;
+      out += `tau-p            = ${tauP}\n`;
+      out += `compressibility  = 4.5e-5\n`;
+      out += `ref-p            = 1.0\n`;
+    }
+    document.getElementById('mdpOutput').textContent = out;
+  };
+
+  window.checkTimestep = function() {
+    const type = document.getElementById('modelType').value;
+    const freq = parseInt(document.getElementById('vibFreq').value);
+    const algo = document.getElementById('constraintAlgo').value;
+    let maxDt;
+    if (type === 'flexible') maxDt = 1.0;
+    else if (type === 'rigid') maxDt = 2.0;
+    else maxDt = 5.0;
+    if (algo === 'settle') maxDt = Math.min(maxDt, 2.0);
+    const period = 1 / (freq * 3e10) * 1e15; // fs
+    const safeDt = period / 20; // ~20 steps per period
+    const recommended = Math.min(maxDt, safeDt);
+    document.getElementById('timestepOutput').textContent =
+      `📏 Highest vibrational period: ${period.toFixed(1)} fs\n` +
+      `⚡ Max stable dt (20 steps/period): ${safeDt.toFixed(2)} fs\n` +
+      `🔧 Constraint limit (${type}): ${maxDt} fs\n` +
+      `✅ Recommended time step: ${recommended.toFixed(1)} fs\n\n` +
+      `💡 For ILs with flexible alkyl chains, test energy conservation at chosen dt.`;
+  };
+
+  window.planConvergence = function() {
+    const prop = document.getElementById('targetProp').value;
+    const budget = parseInt(document.getElementById('computeBudget').value);
+    const reps = parseInt(document.getElementById('numReplicas').value);
+    const nsPerDay = 50; // rough GPU-day estimate for 1000 ion pairs
+    const totalNs = budget * nsPerDay;
+    const nsPerRep = totalNs / reps;
+    let recommended, minNs;
+    switch(prop) {
+      case 'structure': minNs = 20; recommended = 50; break;
+      case 'diffusion': minNs = 100; recommended = 200; break;
+      case 'conductivity': minNs = 200; recommended = 500; break;
+      case 'viscosity': minNs = 100; recommended = 300; break;
+      case 'slow': minNs = 1000; recommended = 2000; break;
+    }
+    let status = nsPerRep >= recommended ? '✅ Sufficient' : nsPerRep >= minNs ? '⚠️ Minimal' : '❌ Insufficient';
+    document.getElementById('convergenceOutput').textContent =
+      `🎯 Target: ${prop}\n` +
+      `💰 Budget: ${budget} GPU-days → ~${totalNs} ns total\n` +
+      `🔁 ${reps} replicas → ${nsPerRep.toFixed(0)} ns each\n` +
+      `📋 Recommended: ${recommended} ns/replica (min ${minNs} ns)\n` +
+      `${status}\n\n` +
+      (nsPerRep < recommended ? `💡 Consider: fewer replicas with longer runs, or more compute.` : `💡 Good! Run replicas with different initial velocities.`);
+  };
+
+  document.getElementById('tocToggle').addEventListener('click', () => {
+    const panel = document.getElementById('tocPanel');
+    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+  });
+
+  updateProgressUI();
+  buildTOC();
+
+  document.addEventListener('keydown', e => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+    if (e.key === 't') themeToggle.click();
+    if (e.key === 'c') document.getElementById('tocToggle').click();
+  });
+})();
+</script>
+<script src="socratic.js" defer></script>
+</body>
+</html>

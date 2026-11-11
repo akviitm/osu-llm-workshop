@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Performance - MDTransport</title>
+    <meta name="description" content="Computational performance benchmarks for MDTransport across hardware, file formats, and backends.">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <nav class="nav container">
+            <a href="index.html" class="nav-brand">
+                <svg class="logo" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="32" height="32" rx="6" fill="currentColor"/>
+                    <path d="M8 12h16M8 16h12M8 20h8" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+                </svg>
+                <span>MDTransport</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">Overview</a></li>
+                <li><a href="features.html">Features</a></li>
+                <li><a href="theory.html">Theory</a></li>
+                <li><a href="installation.html">Installation</a></li>
+                <li><a href="performance.html" class="active">Performance</a></li>
+                <li><a href="references.html">References</a></li>
+            </ul>
+            <a href="https://github.com/ShahResearchGroup/MDTransport" class="nav-github" target="_blank" rel="noopener">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+                GitHub
+            </a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="page-header">
+            <div class="container">
+                <h1>Computational Performance</h1>
+                <p class="page-subtitle">Benchmarks across hardware, file formats, and parsing backends</p>
+            </div>
+        </section>
+
+        <section class="perf-section">
+            <div class="container">
+                <h2 class="section-title">Test System</h2>
+                <div class="test-system">
+                    <div class="system-spec">
+                        <h3>Benchmark System</h3>
+                        <ul>
+                            <li><strong>System:</strong> 500 ion pairs of 1-ethyl-3-methylimidazolium [C2mim] tetrafluoroborate [BF4]</li>
+                            <li><strong>Trajectory:</strong> 100 ns, 20,001 snapshots (Fig 3a,b) / 100,001 snapshots (Fig 3c)</li>
+                            <li><strong>Analysis:</strong> Einstein ionic conductivity</li>
+                            <li><strong>Details:</strong> Section S4 of Supporting Information</li>
+                        </ul>
+                    </div>
+                    <div class="system-spec">
+                        <h3>Hardware Platforms Tested</h3>
+                        <ul>
+                            <li><strong>Mac:</strong> Apple Silicon (M-series)</li>
+                            <li><strong>Intel:</strong> x86_64 multi-core</li>
+                            <li><strong>AMD:</strong> x86_64 multi-core</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="perf-section bg-muted">
+            <div class="container">
+                <h2 class="section-title">Core Count Scaling (Figure 3a, 3b)</h2>
+                <div class="perf-grid">
+                    <article class="perf-card">
+                        <h3>.xtc Format (Binary)</h3>
+                        <div class="perf-metric">
+                            <span class="metric-label">1 core → 8 cores</span>
+                            <span class="metric-value">Significant speedup</span>
+                        </div>
+                        <p>Performance scales with core count across all backends (MDAnalysis, Chemfiles, OVITO). Exact speedup factor varies by backend.</p>
+                        <div class="perf-note">Binary formats benefit most from parallel parsing.</div>
+                    </article>
+                    <article class="perf-card">
+                        <h3>.pdb Format (Text)</h3>
+                        <div class="perf-metric">
+                            <span class="metric-label">1 core → 8 cores</span>
+                            <span class="metric-value">Moderate speedup</span>
+                        </div>
+                        <p>Text-based .pdb parsing is inherently slower than .xtc. Core scaling improvement is slightly less pronounced.</p>
+                        <div class="perf-note">PDB mode optimized for multiprocessing snapshot handling.</div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="perf-section">
+            <div class="container">
+                <h2 class="section-title">GROMACS vs LAMMPS (Figure 3c)</h2>
+                <div class="comparison-card">
+                    <h3>100,001 Snapshots Comparison</h3>
+                    <div class="comparison-grid">
+                        <div class="comparison-item">
+                            <h4>GROMACS .xtc</h4>
+                            <p>Comparable performance to LAMMPS. Minor differences only in initial trajectory setup (MDAnalysis Universe creation).</p>
+                        </div>
+                        <div class="comparison-item">
+                            <h4>LAMMPS .lammpstrj / .xtc</h4>
+                            <p>Similar throughput. LAMMPS requires <code>--t_steps</code> and <code>--dump_frame</code> for dt calculation.</p>
+                        </div>
+                    </div>
+                    <p class="comparison-conclusion">Both engines show equivalent postprocessing performance — choice of MD engine doesn't affect analysis speed.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="perf-section bg-muted">
+            <div class="container">
+                <h2 class="section-title">Hardware Platform Comparison (Figure 3d)</h2>
+                <div class="hw-comparison">
+                    <div class="hw-finding">
+                        <h3>Apple Silicon (Mac) — Outstanding Performance</h3>
+                        <p>Calculations run <strong>substantially faster</strong> on Macs vs Intel/AMD with <code>--n_cores = 8</code> for large files. Unified memory architecture and high memory bandwidth excel at data-intensive trajectory parsing.</p>
+                    </div>
+                    <div class="hw-finding">
+                        <h3>Intel / AMD x86_64</h3>
+                        <p>Solid performance with good scaling. Performance depends on specific CPU generation, memory speed, and storage type (NVMe vs SSD vs HDD).</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="perf-section">
+            <div class="container">
+                <h2 class="section-title">Backend Performance by File Format (Figure 4)</h2>
+                <div class="backend-table-container">
+                    <table class="backend-table">
+                        <thead>
+                            <tr>
+                                <th>Format</th>
+                                <th>Fastest Parser</th>
+                                <th>Time (20,001 frames)</th>
+                                <th>Lowest Memory</th>
+                                <th>Peak Memory</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>.pdb</code> (text)</td>
+                                <td>Chemfiles</td>
+                                <td>1.52 min</td>
+                                <td>Chemfiles</td>
+                                <td>0.50 GB</td>
+                            </tr>
+                            <tr>
+                                <td><code>.lammpstrj</code> (text)</td>
+                                <td>OVITO</td>
+                                <td>2.14 min</td>
+                                <td>Chemfiles</td>
+                                <td>0.43 GB</td>
+                            </tr>
+                            <tr>
+                                <td><code>.xtc</code> (binary)</td>
+                                <td>Chemfiles</td>
+                                <td>0.14 min</td>
+                                <td>MDAnalysis</td>
+                                <td>0.55 GB</td>
+                            </tr>
+                            <tr>
+                                <td><code>.trr</code> (binary)</td>
+                                <td>Chemfiles / MDAnalysis</td>
+                                <td>~0.14 min</td>
+                                <td>MDAnalysis</td>
+                                <td>0.55 GB</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="backend-insights">
+                    <h3>Key Insights</h3>
+                    <ul>
+                        <li><strong>Text formats (.pdb, .lammpstrj):</strong> Chemfiles and OVITO dominate. Chemfiles: lowest memory for both. OVITO: fastest for .lammpstrj.</li>
+                        <li><strong>Binary formats (.xtc, .trr):</strong> Chemfiles and MDAnalysis are significantly faster (~10x vs text). MDAnalysis wins on memory efficiency for compressed formats.</li>
+                        <li><strong>Recommendation:</strong> Use <code>.xtc</code> with MDAnalysis for best balance of speed and memory. Use Chemfiles for lowest memory footprint on text formats.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="perf-section bg-muted">
+            <div class="container">
+                <h2 class="section-title">Disk-Backed Processing (Figure 4c, 4d)</h2>
+                <div class="disk-grid">
+                    <article class="disk-card">
+                        <h3>Memory Reduction</h3>
+                        <div class="disk-metric">~50% reduction</div>
+                        <p>Peak memory vs standard in-memory processing for 1M atom system (10,001 frames). Streams intermediate atomic/COM data to disk.</p>
+                    </article>
+                    <article class="disk-card">
+                        <h3>Execution Time</h3>
+                        <div class="disk-metric">Comparable</div>
+                        <p>Similar times for typical systems. I/O overhead may increase time for exceptionally large systems due to disk read latency.</p>
+                    </article>
+                    <article class="disk-card">
+                        <h3>Storage Hardware Impact</h3>
+                        <div class="disk-metric">NVMe &gt; SSD &gt; HDD</div>
+                        <p>Performance overhead depends on underlying storage. NVMe minimizes penalty; HDD may show noticeable slowdown.</p>
+                    </article>
+                    <article class="disk-card">
+                        <h3>Ultra-Low Memory</h3>
+                        <div class="disk-metric">Single-core + --disk</div>
+                        <p>For extremely constrained environments: combine <code>--disk</code> with <code>--n_cores 1</code> to minimize RAM footprint (multiprocessing adds overhead per worker).</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="perf-section">
+            <div class="container">
+                <h2 class="section-title">Typical Analysis Times</h2>
+                <div class="time-grid">
+                    <div class="time-card">
+                        <h3>Small System (~10K atoms, 10K frames)</h3>
+                        <div class="time-value">~10–30 seconds</div>
+                    </div>
+                    <div class="time-card">
+                        <h3>Medium System (~100K atoms, 20K frames)</h3>
+                        <div class="time-value">~1–2 minutes</div>
+                    </div>
+                    <div class="time-card">
+                        <h3>Large System (~1M atoms, 10K frames)</h3>
+                        <div class="time-value">~2–5 minutes</div>
+                    </div>
+                    <div class="time-card">
+                        <h3>With --disk mode</h3>
+                        <div class="time-value">+10–30% time</div>
+                    </div>
+                </div>
+                <p class="time-note">All times on 8-core modern CPU. MDTransport typically takes a fraction of a minute to a couple of minutes regardless of mode, cores, or architecture.</p>
+            </div>
+        </section>
+
+        <section class="perf-section bg-muted">
+            <div class="container">
+                <h2 class="section-title">Optimization Recommendations</h2>
+                <div class="opt-grid">
+                    <article class="opt-card">
+                        <h4>For Speed</h4>
+                        <ul>
+                            <li>Use <code>.xtc</code> binary format</li>
+                            <li>Install MDAnalysis or Chemfiles</li>
+                            <li>Use <code>--n_cores</code> = all available</li>
+                            <li>Prefer Mac (Apple Silicon) or modern x86_64</li>
+                            <li>Use <code>--eh</code> flag for conductivity (O(N) vs O(N²))</li>
+                        </ul>
+                    </article>
+                    <article class="opt-card">
+                        <h4>For Low Memory</h4>
+                        <ul>
+                            <li>Use <code>--disk</code> flag</li>
+                            <li>Use Chemfiles backend (<code>--chem</code>)</li>
+                            <li>Use <code>--n_cores 1</code> or <code>2</code></li>
+                            <li>Use <code>.xtc</code> with MDAnalysis (lowest for binary)</li>
+                            <li>Process in chunks if possible</li>
+                        </ul>
+                    </article>
+                    <article class="opt-card">
+                        <h4>For HPC Clusters</h4>
+                        <ul>
+                            <li><code>--mp_mode forkserver</code> or <code>spawn</code></li>
+                            <li>Explicit <code>--n_cores</code> per job allocation</li>
+                            <li>Use <code>--disk</code> on shared filesystems</li>
+                            <li>Pre-convert to <code>.xtc</code> if possible</li>
+                            <li>Container/Singularity for reproducibility</li>
+                        </ul>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="perf-section">
+            <div class="container">
+                <h2 class="section-title">Scaling Characteristics</h2>
+                <div class="scaling-content">
+                    <h3>Strong Scaling (fixed problem, more cores)</h3>
+                    <p>Near-linear speedup up to 8 cores for binary formats. Diminishing returns beyond 8–16 cores due to I/O contention and Python multiprocessing overhead.</p>
+                    <h3>Weak Scaling (larger problem, proportional cores)</h3>
+                        <p>Excellent for trajectory length scaling. Memory scales with <code>--disk</code> mode. Time scales linearly with frame count.</p>
+                    <h3>System Size Scaling</h3>
+                    <p>O(N) for EH conductivity/Onsager. O(N²) for standard Einstein cross-correlations (mitigated by <code>--n_delta</code> window limit). RDF: O(N²) but optimized with binning.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-links">
+                    <a href="index.html">Overview</a>
+                    <a href="features.html">Features</a>
+                    <a href="theory.html">Theory</a>
+                    <a href="installation.html">Installation</a>
+                    <a href="performance.html">Performance</a>
+                    <a href="references.html">References</a>
+                </div>
+                <p class="footer-license">Licensed under GNU GPL v3.0 · © 2026 The Authors</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

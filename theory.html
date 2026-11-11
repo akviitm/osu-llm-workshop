@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theory - MDTransport</title>
+    <meta name="description" content="Mathematical foundations and theoretical background for transport property calculations in MDTransport.">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <nav class="nav container">
+            <a href="index.html" class="nav-brand">
+                <svg class="logo" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="32" height="32" rx="6" fill="currentColor"/>
+                    <path d="M8 12h16M8 16h12M8 20h8" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+                </svg>
+                <span>MDTransport</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">Overview</a></li>
+                <li><a href="features.html">Features</a></li>
+                <li><a href="theory.html" class="active">Theory</a></li>
+                <li><a href="installation.html">Installation</a></li>
+                <li><a href="performance.html">Performance</a></li>
+                <li><a href="references.html">References</a></li>
+            </ul>
+            <a href="https://github.com/ShahResearchGroup/MDTransport" class="nav-github" target="_blank" rel="noopener">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+                GitHub
+            </a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="page-header">
+            <div class="container">
+                <h1>Theoretical Background</h1>
+                <p class="page-subtitle">Mathematical foundations for transport property calculations</p>
+            </div>
+        </section>
+
+        <section class="theory-section">
+            <div class="container">
+                <h2 class="section-title">Mean-Squared Displacement (MSD)</h2>
+                <p>The mean-squared displacement for a group of <em>N<sub>k</sub></em> entities (atoms, molecules, or fragments) is defined as:</p>
+                <div class="equation">
+                    <span class="eq-label">Eq. 1</span>
+                    <pre><code>MSD(Δt) = (1/N<sub>k</sub>) Σ<sub>i=1</sub><sup>N<sub>k</sub></sup> ⟨|r<sub>i</sub><sup>c</sup>(t+Δt) - r<sub>i</sub><sup>c</sup>(t)|<sup>2</sup>⟩</code></pre>
+                </div>
+                <p>Where <em>r<sub>i</sub><sup>c</sup></em> is the center-of-mass position of the <em>i</em>-th entity, and ⟨···⟩ denotes time averaging over all origins <em>t</em>. The dimensionality <em>d</em> defaults to 3 (x, y, z) but can be restricted to 1D or 2D via the <code>--dir</code> flag for anisotropic systems (nanotubes, slab geometries).</p>
+
+                <h3>FFT-Accelerated Computation</h3>
+                <p>Expanding the squared displacement yields three terms (Eq. 3):</p>
+                <div class="equation">
+                    <span class="eq-label">Eq. 3</span>
+                    <pre><code>|r(t+Δt) - r(t)|<sup>2</sup> = |r(t+Δt)|<sup>2</sup> + |r(t)|<sup>2</sup> - 2 r(t+Δt)·r(t)</code></pre>
+                </div>
+                <p>The third term is the time-autocorrelation of the position vector, computed efficiently via Fast Fourier Transform (FFT) following Fong et al. (2017). The final MSD expression (Eq. 4) becomes:</p>
+                <div class="equation">
+                    <span class="eq-label">Eq. 4</span>
+                    <pre><code>MSD(Δt) = (1/N<sub>k</sub>) Σ<sub>i=1</sub><sup>N<sub>k</sub></sup> [ ⟨|r<sub>i</sub><sup>c</sup>(t+Δt)|<sup>2</sup>⟩ + ⟨|r<sub>i</sub><sup>c</sup>(t)|<sup>2</sup>⟩ - 2 ⟨r<sub>i</sub><sup>c</sup>(t+Δt)·r<sub>i</sub><sup>c</sup>(t)⟩ ]</code></pre>
+                </div>
+
+                <h3>Self-Diffusion Coefficient</h3>
+                <p>In the diffusive regime (long times), MSD grows linearly:</p>
+                <div class="equation">
+                    <span class="eq-label">Eq. 2</span>
+                    <pre><code>MSD(Δt) = 2d D Δt</code></pre>
+                </div>
+                <p>MDTransport evaluates the diffusion regime over a user-defined time window. The slope is determined via adaptive fitting (linear regression with automatic window selection) to minimize bias. Uncertainty is quantified via block averaging, time-window variation, and ensemble approaches.</p>
+            </div>
+        </section>
+
+        <section class="theory-section bg-muted">
+            <div class="container">
+                <h2 class="section-title">Ionic Conductivity</h2>
+
+                <h3>Nernst-Einstein Conductivity</h3>
+                <p>The ideal conductivity assumes uncorrelated ion motion:</p>
+                <div class="equation">
+                    <span class="eq-label">Eq. 6</span>
+                    <pre><code>σ<sub>NE</sub> = (1/Vk<sub>B</sub>T) Σ<sub>i</sub> N<sub>i</sub> z<sub>i</sub><sup>2</sup> D<sub>i</sub></code></pre>
+                </div>
+                <p>Where <em>V</em> = volume, <em>k<sub>B</sub></em> = Boltzmann constant, <em>T</em> = temperature, <em>N<sub>i</sub></em> = number of ions of species <em>i</em>, <em>z<sub>i</sub></em> = charge, <em>D<sub>i</sub></em> = self-diffusion coefficient.</p>
+
+                <h3>Einstein Conductivity (Full Correlation)</h3>
+                <p>Accounts for ion-ion correlations via collective charge displacement:</p>
+                <div class="equation">
+                    <span class="eq-label">Eq. 7</span>
+                    <pre><code>σ<sub>EN</sub> = lim<sub>t→∞</sub> (1/2Vk<sub>B</sub>T) ⟨ [ Σ<sub>i,j</sub> z<sub>i</sub>z<sub>j</sub> (r<sub>i</sub><sup>c</sup>(t) - r<sub>i</sub><sup>c</sup>(0))·(r<sub>j</sub><sup>c</sup>(t) - r<sub>j</sub><sup>c</sup>(0)) ] ⟩ / t</code></pre>
+                </div>
+                <p>Decomposes into self (i=j) and cross-correlation (i≠j) contributions. For a salt [C][A]:</p>
+                <div class="equation">
+                    <span class="eq-label">Eq. 8</span>
+                    <pre><code>σ<sub>EN</sub> = σ<sub>[C]</sub><sup>self</sup> + σ<sub>[A]</sub><sup>self</sup> + σ<sub>[C]-[C]</sub><sup>cross</sup> + σ<sub>[A]-[A]</sub><sup>cross</sup> + σ<sub>[C]-[A]</sub><sup>cross</sup></code></pre>
+                </div>
+                <p>The first two terms sum to σ<sub>NE</sub>. The cross terms reveal correlation effects: negative cross-correlation reduces conductivity (ion pairing), positive enhances it (collective motion).</p>
+
+                <h3>Slope Method</h3>
+                <p>The correlation term <em>C(t) = Σ z<sub>i</sub>z<sub>j</sub> Δr<sub>i</sub>·Δr<sub>j</sub></em> is plotted vs. time. The slope over the first 1 ns (configurable via <code>--min_window</code>) gives σ<sub>EN</sub>. Multiple time origins improve statistics.</p>
+
+                <h3>Einstein-Helfand (EH) Formalism</h3>
+                <p>Uses the total dipole moment of each species, bypassing pairwise sums:</p>
+                <div class="equation">
+                    <pre><code>M<sub>α</sub>(t) = Σ<sub>i∈α</sub> z<sub>i</sub> r<sub>i</sub><sup>c</sup>(t)</code></pre>
+                </div>
+                <div class="equation">
+                    <pre><code>σ<sub>EH</sub> = lim<sub>t→∞</sub> (1/2Vk<sub>B</sub>T) ⟨ |M(t) - M(0)|<sup>2</sup> ⟩ / t</code></pre>
+                </div>
+                <p>Computational cost: O(N) vs O(N<sup>2</sup>) for standard Einstein. Enables full-trajectory sliding windows. Enabled via <code>--corr --eh</code>.</p>
+            </div>
+        </section>
+
+        <section class="theory-section">
+            <div class="container">
+                <h2 class="section-title">Spatial Decomposition Analysis (SPDA)</h2>
+                <p>Decomposes cross-correlations by distance from a reference ion. Ions are categorized by distance <em>r<sub>cut</sub></em> from reference:</p>
+                <div class="equation">
+                    <span class="eq-label">Eq. 16</span>
+                    <pre><code>σ<sub>proximal</sub> = lim<sub>t→∞</sub> (1/2Vk<sub>B</sub>T) Σ<sub>i</sub> Σ<sub>j: r<sub>ij</sub>&lt;r<sub>cut</sub></sub> z<sub>i</sub>z<sub>j</sub> ⟨Δr<sub>i</sub>·Δr<sub>j</sub>⟩ / t</code></pre>
+                </div>
+                <div class="equation">
+                    <span class="eq-label">Eq. 17</span>
+                    <pre><code>σ<sub>distant</sub> = lim<sub>t→∞</sub> (1/2Vk<sub>B</sub>T) Σ<sub>i</sub> Σ<sub>j: r<sub>ij</sub>&gt;r<sub>cut</sub></sub> z<sub>i</sub>z<sub>j</sub> ⟨Δr<sub>i</sub>·Δr<sub>j</sub>⟩ / t</code></pre>
+                </div>
+                <p>Three ion subsets around each reference: always inside, always outside, jumping across <em>r<sub>cut</sub></em>. Default <em>r<sub>cut</sub></em> = 2nd RDF minimum (2nd solvation shell). Override with <code>--shell</code> (1st shell) or <code>--rcut</code> (custom).</p>
+            </div>
+        </section>
+
+        <section class="theory-section bg-muted">
+            <div class="container">
+                <h2 class="section-title">Onsager Transport Coefficients</h2>
+                <p>Generalized transport coefficients for multicomponent systems:</p>
+                <div class="equation">
+                    <span class="eq-label">Eq. 18–22</span>
+                    <pre><code>L<sub>αβ</sub> = lim<sub>t→∞</sub> (1/2Vk<sub>B</sub>T) ⟨ [Σ<sub>i∈α</sub> z<sub>i</sub> Δr<sub>i</sub>]·[Σ<sub>j∈β</sub> z<sub>j</sub> Δr<sub>j</sub>] ⟩ / t</code></pre>
+                </div>
+                <p>Standard Einstein requires O(N<sup>2</sup>) pairwise cross-displacements. EH formalism (<code>--onsg --eh</code>) uses collective species displacements:</p>
+                <div class="equation">
+                    <pre><code>L<sub>αβ</sub><sup>EH</sup> = lim<sub>t→∞</sub> (1/2Vk<sub>B</sub>T) ⟨ [Σ<sub>i∈α</sub> Δr<sub>i</sub>]·[Σ<sub>j∈β</sub> Δr<sub>j</sub>] ⟩ / t</code></pre>
+                </div>
+                <p>(No charge weighting in the collective variable; charge factors applied in final combination.) Dramatically reduces cost, enables long sliding windows.</p>
+            </div>
+        </section>
+
+        <section class="theory-section">
+            <div class="container">
+                <h2 class="section-title">Transference Numbers</h2>
+
+                <h3>Ideal Transference Number</h3>
+                <div class="equation">
+                    <span class="eq-label">Eq. 23</span>
+                    <pre><code>t<sub>i</sub><sup>ideal</sup> = (N<sub>i</sub> z<sub>i</sub><sup>2</sup> D<sub>i</sub>) / Σ<sub>j</sub> (N<sub>j</sub> z<sub>j</sub><sup>2</sup> D<sub>j</sub>)</code></pre>
+                </div>
+
+                <h3>Real Transference Number (with correlations)</h3>
+                <div class="equation">
+                    <span class="eq-label">Eq. 24</span>
+                    <pre><code>t<sub>i</sub><sup>real</sup> = (σ<sub>i</sub><sup>self</sup> + 0.5 σ<sub>i-i</sub><sup>cross</sup> + Σ<sub>j≠i</sub> σ<sub>i-j</sub><sup>cross</sup>) / σ<sub>EN</sub></code></pre>
+                </div>
+                <p>Computed alongside Einstein conductivity. <code>σ<sub>i</sub><sup>self</sup></code> = self-diffusion contribution; <code>σ<sub>i-i</sub><sup>cross</sup></code> = intracomponent correlation; <code>σ<sub>i-j</sub><sup>cross</sup></code> = intercomponent correlation.</p>
+            </div>
+        </section>
+
+        <section class="theory-section bg-muted">
+            <div class="container">
+                <h2 class="section-title">Stefan-Maxwell Diffusivity</h2>
+                <p>Diffusion coefficient for species pair (i, j) in multicomponent systems:</p>
+                <div class="equation">
+                    <span class="eq-label">Eq. 25</span>
+                    <pre><code>MSD<sub>ij</sub>(Δt) = (1/N<sub>i</sub>N<sub>j</sub>) Σ<sub>i=1</sub><sup>N<sub>i</sub></sup> Σ<sub>j=1</sub><sup>N<sub>j</sub></sup> ⟨ |Δr<sub>i</sub><sup>c</sup> - Δr<sub>j</sub><sup>c</sup>|<sup>2</sup> ⟩</code></pre>
+                </div>
+                <p>Where <em>Δr<sub>i</sub><sup>c</sup> = r<sub>i</sub><sup>c</sup>(t+Δt) - r<sub>i</sub><sup>c</sup>(t)</em>. D<sub>ij</sub> obtained from long-time slope of MSD<sub>ij</sub>.</p>
+            </div>
+        </section>
+
+        <section class="theory-section">
+            <div class="container">
+                <h2 class="section-title">Cage Correlation Lifetimes</h2>
+                <p>A cage around species <em>i</em> is defined by all species <em>j</em> within the 1st solvation shell (RDF first minimum). The Heaviside function tracks identity persistence:</p>
+                <div class="equation">
+                    <span class="eq-label">Eq. 28</span>
+                    <pre><code>C<sub>cage</sub>(t) = (1/N(t<sub>0</sub>)) Σ<sub>k=1</sub><sup>N(t<sub>0</sub>)</sup> h<sub>k</sub>(t) / h<sub>k</sub>(0)</code></pre>
+                </div>
+                <p><em>h(t) = 1</em> if cage identity maintained, <em>0</em> if any ion enters/exits. Cages can reform. Lifetime via integration or 3-exponential fit:</p>
+                <div class="equation">
+                    <span class="eq-label">Eq. 29–31</span>
+                    <pre><code>τ<sub>cage</sub> = ∫<sub>0</sub><sup>∞</sup> C<sub>cage</sub>(t) dt
+C<sub>cage</sub>(t) = a<sub>1</sub>exp(-t/b<sub>1</sub>) + a<sub>2</sub>exp(-t/b<sub>2</sub>) + a<sub>3</sub>exp(-t/b<sub>3</sub>)
+τ<sub>cage</sub> = a<sub>1</sub>b<sub>1</sub> + a<sub>2</sub>b<sub>2</sub> + a<sub>3</sub>b<sub>3</sub>  (with a<sub>3</sub> = 1 - a<sub>1</sub> - a<sub>2</sub>)</code></pre>
+                </div>
+                <p>Flags: <code>--cage --ref_species X --cage_species Y [--rcut Z]</code></p>
+            </div>
+        </section>
+
+        <section class="theory-section bg-muted">
+            <div class="container">
+                <h2 class="section-title">Pair Correlation Lifetimes</h2>
+                <p>For each reference <em>i</em>, identify nearest target species <em>j</em> (minimum COM distance). Track identity over time:</p>
+                <div class="equation">
+                    <span class="eq-label">Eq. 32</span>
+                    <pre><code>C<sub>pair</sub>(t) = (1/N(t<sub>0</sub>)) Σ<sub>k=1</sub><sup>N(t<sub>0</sub>)</sup> h<sub>k</sub>(t) / h<sub>k</sub>(0)</code></pre>
+                </div>
+                <p><em>h(t) = 1</em> while same nearest neighbor, <em>0</em> if another ion becomes closer. Reformation allowed. τ<sub>pair</sub> via 3-exponential fit. Flags: <code>--pair --ref_species X --pair_species Y [--rcut Z]</code></p>
+            </div>
+        </section>
+
+        <section class="theory-section">
+            <div class="container">
+                <h2 class="section-title">Radial Distribution Function (RDF)</h2>
+                <p>Standard definition for species <em>i</em> and <em>j</em>:</p>
+                <div class="equation">
+                    <span class="eq-label">Eq. 37</span>
+                    <pre><code>g<sub>ij</sub>(r) = (V / N<sub>i</sub>N<sub>j</sub>) Σ<sub>i=1</sub><sup>N<sub>i</sub></sup> Σ<sub>j=1</sub><sup>N<sub>j</sub></sup> δ(r - r<sub>ij</sub>) / (4πr<sup>2</sup>Δr)</code></pre>
+                </div>
+                <p>Kronecker δ = 1 if <em>r<sub>ij</sub> ∈ [r, r+Δr)</em>, else 0. Modes: COM-COM (default), atom-atom, atom-COM via <code>--rdf_mode --rdf_pairs</code>. Auto-analysis (<code>--ana</code>) extracts: 1st peak radius/height, 1st/2nd shell radii, coordination number.</p>
+            </div>
+        </section>
+
+        <section class="theory-section bg-muted">
+            <div class="container">
+                <h2 class="section-title">Key References for Theory</h2>
+                <div class="ref-list">
+                    <p>[24] Verma et al. <em>J. Phys. Chem. B</em> 2025, 129, 2546–2559.</p>
+                    <p>[26] France-Lanord & Grossman. <em>Phys. Rev. Lett.</em> 2019, 122, 136001.</p>
+                    <p>[27] Maginn et al. <em>Living J. Comput. Mol. Sci.</em> 2019, 1, 6324.</p>
+                    <p>[28] Fong et al. <em>J. Chem. Phys.</em> 2017 (FFT MSD).</p>
+                    <p>[38–40] Einstein conductivity formalism.</p>
+                    <p>[41–43] Cross-correlation decomposition.</p>
+                    <p>[52–53] Stefan-Maxwell diffusivity.</p>
+                    <p>[54] Cage correlation lifetimes.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-links">
+                    <a href="index.html">Overview</a>
+                    <a href="features.html">Features</a>
+                    <a href="theory.html">Theory</a>
+                    <a href="installation.html">Installation</a>
+                    <a href="performance.html">Performance</a>
+                    <a href="references.html">References</a>
+                </div>
+                <p class="footer-license">Licensed under GNU GPL v3.0 · © 2026 The Authors</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MDTransport Performance Analysis — OSU LLM Workshop</title>
+<style>
+:root {
+  --banner-bg: #e86c00;
+  --banner-text: #fff;
+  --primary: #2c3e50;
+  --accent: #1a73e8;
+  --accent-hover: #155ab6;
+  --bg: #fafafa;
+  --card-bg: #fff;
+  --border: #e0e0e0;
+  --text: #222;
+  --muted: #666;
+  --socratic-bg: #f0f7ff;
+  --socratic-border: #1a73e8;
+  --code-bg: #1e1e1e;
+  --code-text: #d4d4d4;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --banner-bg: #ff8c00;
+    --banner-text: #000;
+    --primary: #e0e0e0;
+    --accent: #64b5f6;
+    --accent-hover: #90caf9;
+    --bg: #121212;
+    --card-bg: #1e1e1e;
+    --border: #333;
+    --text: #e0e0e0;
+    --muted: #aaa;
+    --socratic-bg: #0d1b2a;
+    --socratic-border: #64b5f6;
+    --code-bg: #1e1e1e;
+    --code-text: #d4d4d4;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 1rem 3rem;
+  line-height: 1.6;
+  background: var(--bg);
+  color: var(--text);
+  transition: background 0.3s, color 0.3s;
+}
+.banner {
+  background: var(--banner-bg);
+  color: var(--banner-text);
+  padding: 1rem 1.5rem;
+  margin: 0 -1rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+.banner h1 { margin: 0; font-size: 1.25rem; font-weight: 600; }
+.banner-actions { display: flex; gap: 0.5rem; align-items: center; }
+.banner-btn {
+  background: rgba(255,255,255,0.2);
+  border: 1px solid rgba(255,255,255,0.4);
+  color: var(--banner-text);
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: background 0.2s, transform 0.1s;
+}
+.banner-btn:hover { background: rgba(255,255,255,0.3); }
+.banner-btn:active { transform: scale(0.98); }
+h1 { border-bottom: 2px solid var(--primary); padding-bottom: 0.5rem; color: var(--primary); margin-top: 0; }
+nav { margin: 1.5rem 0; padding: 1rem; background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+nav a { display: block; margin: 0.5rem 0; text-decoration: none; color: var(--primary); font-weight: 500; padding: 0.5rem 0.75rem; border-radius: 6px; transition: background 0.2s, color 0.2s, transform 0.1s; }
+nav a:hover { background: var(--socratic-bg); color: var(--accent-hover); transform: translateX(4px); }
+section { margin: 2rem 0; }
+.socratic {
+  border-left: 4px solid var(--socratic-border);
+  padding: 1rem 1.25rem;
+  margin: 1.5rem 0;
+  background: var(--socratic-bg);
+  border-radius: 0 10px 10px 0;
+  position: relative;
+  overflow: hidden;
+}
+.socratic::before { content: "💡 Check your understanding"; display: block; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--socratic-border); margin-bottom: 0.5rem; }
+.socratic p { margin: 0; }
+table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+th, td { padding: 0.75rem; border-bottom: 1px solid var(--border); text-align: left; }
+th { background: var(--primary); color: #fff; font-weight: 600; }
+tr:hover td { background: var(--socratic-bg); }
+pre { background: var(--code-bg); color: var(--code-text); padding: 1rem; border-radius: 10px; overflow-x: auto; margin: 1rem 0; }
+code { font-family: 'Monaco', 'Menlo', 'Consolas', monospace; font-size: 0.9em; }
+details { background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; margin: 1rem 0; overflow: hidden; }
+summary { padding: 1rem 1.25rem; cursor: pointer; font-weight: 600; list-style: none; display: flex; align-items: center; gap: 0.5rem; }
+summary::-webkit-details-marker { display: none; }
+summary::after { content: "▶"; font-size: 0.7rem; color: var(--muted); transition: transform 0.2s; margin-left: auto; }
+details[open] summary::after { transform: rotate(90deg); }
+details[open] summary { border-bottom: 1px solid var(--border); }
+details > div { padding: 1rem 1.25rem; }
+progress { width: 100%; height: 10px; border-radius: 5px; appearance: none; }
+progress::-webkit-progress-bar { background: var(--border); border-radius: 5px; }
+progress::-webkit-progress-value { background: var(--accent); border-radius: 5px; }
+progress::-moz-progress-bar { background: var(--accent); border-radius: 5px; }
+.footer-note { text-align: center; color: var(--muted); font-size: 0.85rem; margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+.badge { display: inline-block; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; }
+.badge-ok { background: #e8f5e9; color: #2e7d32; }
+.badge-flagged { background: #fff3e0; color: #e65100; }
+.chart-container { background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem; margin: 1.5rem 0; }
+.chart-container canvas { max-width: 100%; height: auto; }
+@media (max-width: 600px) {
+  .banner { margin: 0 -1rem 1.5rem; padding: 1rem; }
+  .banner h1 { font-size: 1.1rem; }
+  nav a { padding: 0.75rem; }
+}
+</style>
+</head>
+<body>
+<div class="banner" role="banner">
+  <h1>⚡ MDTransport Performance Analysis</h1>
+  <div class="banner-actions">
+    <a href="index.html" class="banner-btn" style="text-decoration:none;">← Back to Course</a>
+    <button class="banner-btn" id="themeToggle" aria-label="Toggle theme">🌙</button>
+  </div>
+</div>
+
+<h1>Computational Performance of MDTransport for MD Trajectory Analysis</h1>
+
+<nav>
+  <strong>Related Pages:</strong>
+  <a href="index.html">Course Home</a>
+  <a href="molecular-dynamics.html">Molecular Dynamics Fundamentals</a>
+  <a href="advanced-topics.html">Advanced Topics</a>
+</nav>
+
+<section>
+  <h2>Overview</h2>
+  <p>This page presents a systematic analysis of the computational performance reported in the MDTransport paper (Verma, Thorat &amp; Shah, <em>J. Chem. Inf. Model.</em> 2026, 66, 9989–10003). MDTransport is a Python tool for computing transport properties (ionic conductivity, diffusion coefficients, Onsager coefficients, etc.) from GROMACS and LAMMPS trajectories.</p>
+  
+  <p>We extracted every numeric performance value from the paper, standardized the units, and compared them to understand what drives differences in postprocessing time and memory usage.</p>
+</section>
+
+<section>
+  <h2>Key Performance Values (Standardized)</h2>
+  <p>The paper benchmarks a 100 ns trajectory of a 500 ion-pair [C<sub>2</sub>mim][BF<sub>4</sub>] system for Einstein ionic conductivity calculation (20,001 frames at 5 ps interval). All values below are from <a href="https://doi.org/10.1021/acs.jcim.6c00558">Figure 3 and Figure 4</a> of the paper.</p>
+
+  <div class="chart-container">
+    <canvas id="timeChart" aria-label="Postprocessing time by file format and parser"></canvas>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Metric</th>
+        <th>Value</th>
+        <th>Format</th>
+        <th>Parser</th>
+        <th>Conditions</th>
+        <th>Source</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Postprocessing time</td>
+        <td>0.14 min</td>
+        <td>.xtc / .trr (binary)</td>
+        <td>Chemfiles</td>
+        <td>Figure 4a, 20001 snapshots</td>
+        <td>Row 42</td>
+      </tr>
+      <tr>
+        <td>Postprocessing time</td>
+        <td>1.52 min</td>
+        <td>.pdb (text)</td>
+        <td>Chemfiles</td>
+        <td>Figure 4a, 20001 snapshots</td>
+        <td>Row 40</td>
+      </tr>
+      <tr>
+        <td>Postprocessing time</td>
+        <td>2.14 min</td>
+        <td>.lammpstrj (text)</td>
+        <td>OVITO</td>
+        <td>Figure 4a, 20001 snapshots</td>
+        <td>Row 41</td>
+      </tr>
+      <tr>
+        <td>Peak memory</td>
+        <td>0.50 GB</td>
+        <td>.pdb</td>
+        <td>Chemfiles</td>
+        <td>Figure 4b</td>
+        <td>Row 38</td>
+      </tr>
+      <tr>
+        <td>Peak memory</td>
+        <td>0.43 GB</td>
+        <td>.lammpstrj</td>
+        <td>Chemfiles</td>
+        <td>Figure 4b</td>
+        <td>Row 39</td>
+      </tr>
+      <tr>
+        <td>Peak memory</td>
+        <td>0.55 GB</td>
+        <td>.xtc / .trr (binary)</td>
+        <td>MDAnalysis</td>
+        <td>Figure 4b</td>
+        <td>Row 43</td>
+      </tr>
+      <tr>
+        <td>Memory reduction (disk mode)</td>
+        <td>~50%</td>
+        <td>All</td>
+        <td>Disk-backed</td>
+        <td>Figure 4c/d vs in-memory</td>
+        <td>Row 45</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="chart-container">
+    <canvas id="memoryChart" aria-label="Peak memory by file format and parser"></canvas>
+  </div>
+</section>
+
+<section>
+  <h2>Why Do the Values Differ? — Factor Analysis</h2>
+
+  <details open>
+    <summary>1. File Format: Binary ≫ Text (Dominant Factor)</summary>
+    <div>
+      <p>Binary formats (.xtc, .trr) are processed <strong>~10× faster</strong> (0.14 min) than text formats (.pdb at 1.52 min, .lammpstrj at 2.14 min). This is because binary formats avoid ASCII parsing overhead and are more compact on disk.</p>
+      <p><strong>Paper quote:</strong> "It may be observed that, generally, analysis performed on the files in the pdb format is slower than that on the files in the xtc format." (Row 47, flagged — qualitative)</p>
+    </div>
+  </details>
+
+  <details open>
+    <summary>2. Parser Choice: Significant Interaction with Format</summary>
+    <div>
+      <p>Different parsers excel for different formats:</p>
+      <ul>
+        <li><strong>Chemfiles</strong>: Fastest for .pdb (1.52 min) and binary (0.14 min); lowest memory for text formats (0.50 GB .pdb, 0.43 GB .lammpstrj)</li>
+        <li><strong>OVITO</strong>: Most time-efficient for .lammpstrj (2.14 min)</li>
+        <li><strong>MDAnalysis</strong>: Lowest peak memory for binary trajectories (0.55 GB); MDTransport's default backend</li>
+      </ul>
+      <p><strong>Paper quote:</strong> "the exact factor of improvement may vary based on the tools used, specifically across MDAnalysis, Chemfiles, or OVITO" (Row 48, flagged — qualitative)</p>
+    </div>
+  </details>
+
+  <details open>
+    <summary>3. Hardware Platform: Mac ≫ Intel/AMD</summary>
+    <div>
+      <p>"calculations ran substantially faster on MACs as compared to Intel and AMD-based processors with --n_cores = 8 for a large file" (Row 50, flagged — qualitative). Figure 3(d) shows Mac Mini M2 Pro outperforming Intel Xeon Gold 6130.</p>
+      <p>The M2 Pro's unified memory architecture likely benefits memory-bound trajectory parsing, but the paper does not analyze this mechanism.</p>
+    </div>
+  </details>
+
+  <details open>
+    <summary>4. Core Count &amp; Scaling: Sublinear, Format-Dependent</summary>
+    <div>
+      <p>Performance improves with more cores but scaling is sublinear: "the improvement in processing speed with higher number of cores is also slightly correspondingly less when pdb file format is employed" (Row 48, flagged). The paper uses 1 and 8 cores in Figure 3(a) benchmarks but does not report explicit speedup ratios.</p>
+      <p>External literature (Khoshlessan et al. 2020, <a href="https://doi.org/10.1002/cpe.5789">DOI:10.1002/cpe.5789</a>) shows <strong>near-ideal strong scaling up to 384 cores</strong> with parallel HDF5, achieving <strong>~100× speedup</strong> over serial (Row 53, flagged — "two orders of magnitude").</p>
+    </div>
+  </details>
+
+  <details open>
+    <summary>5. Memory Mode: Disk-Based Cuts Memory ~50%</summary>
+    <div>
+      <p>"disk-backed storage option offloads extracted coordinate data to temporary disk storage rather than maintaining the entire data in RAM, reducing peak memory requirements by approximately 50% compared to standard in-memory processing (Figure 4(c,d))" (Row 45).</p>
+      <p>Trade-off: "increased I/O overhead may result in longer processing times for exceptionally large systems due to disk read latency" (paper, page 13).</p>
+    </div>
+  </details>
+</section>
+
+<section>
+  <h2>Hypotheses Tested &amp; Rejected</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Hypothesis</th>
+        <th>Test</th>
+        <th>Result</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Differences mainly due to system size</td>
+        <td>All benchmarks use same 500 ion-pair system</td>
+        <td><span class="badge badge-flagged">Rejected</span></td>
+      </tr>
+      <tr>
+        <td>Differences mainly due to trajectory length</td>
+        <td>All use 100 ns (20,001 frames) except scaling test</td>
+        <td><span class="badge badge-flagged">Rejected</span></td>
+      </tr>
+      <tr>
+        <td>Parser differences are negligible</td>
+        <td>Chemfiles 0.14 min vs OVITO 2.14 min for different formats</td>
+        <td><span class="badge badge-flagged">Rejected</span></td>
+      </tr>
+      <tr>
+        <td>Hardware differences are negligible</td>
+        <td>Mac "substantially faster" than Intel/AMD</td>
+        <td><span class="badge badge-flagged">Rejected</span></td>
+      </tr>
+      <tr>
+        <td>Core scaling is linear</td>
+        <td>"Slightly correspondingly less" improvement with PDB</td>
+        <td><span class="badge badge-flagged">Rejected</span></td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>What Remains Unexplained</h2>
+  <ol>
+    <li><strong>Absolute scaling factors:</strong> The paper reports wall times but not speedup ratios (1 core → 8 cores). Without baseline single-core times for each parser/format, parallel efficiency cannot be quantified from this paper alone.</li>
+    <li><strong>I/O vs compute breakdown:</strong> For disk-based mode, the paper notes I/O overhead but does not quantify the compute/I/O split.</li>
+    <li><strong>Generalizability to other properties:</strong> Benchmarks only cover Einstein ionic conductivity. Other properties (MSD, Onsager coefficients, cage lifetimes) may have different performance profiles.</li>
+    <li><strong>Comparison to other tools:</strong> The paper compares MDTransport's parser backends but not against standalone tools like PyLAT, TRAVIS, or STACIE. Table 2 shows feature comparison but not performance.</li>
+    <li><strong>Why Mac outperforms x86:</strong> The M2 Pro's unified memory architecture likely benefits memory-bound trajectory parsing, but this is not analyzed.</li>
+  </ol>
+</section>
+
+<div class="socratic" data-question="mdtransport-format-choice">
+  <p>If you were setting up a high-throughput screening campaign for ionic liquid transport properties, which file format and parser combination would you choose based on these benchmarks, and why?</p>
+</div>
+
+<div class="socratic" data-question="mdtransport-scaling">
+  <p>The paper shows sublinear scaling with core count, while Khoshlessan et al. (2020) show near-ideal scaling to 384 cores with parallel HDF5. What architectural difference explains this discrepancy?</p>
+</div>
+
+<footer class="footer-note">
+  <p>Data source: Verma, Thorat &amp; Shah, <em>J. Chem. Inf. Model.</em> 2026, 66, 9989–10003 (<a href="https://doi.org/10.1021/acs.jcim.6c00558">DOI</a>). Analysis in <a href="https://github.com/akviitm/osu-llm-workshop/blob/main/results/answer.md">results/answer.md</a>. Raw values in <a href="https://github.com/akviitm/osu-llm-workshop/blob/main/results/values.csv">results/values.csv</a>.</p>
+</footer>
+
+<script src="js/chart.umd.min.js"></script>
+<script>
+(function() {
+  'use strict';
+  const THEME_KEY = 'il-course-theme';
+  function applyTheme(theme) {
+    if (theme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    else document.documentElement.removeAttribute('data-theme');
+    document.getElementById('themeToggle').textContent = theme === 'dark' ? '☀️' : '🌙';
+    updateCharts();
+  }
+  const savedTheme = localStorage.getItem(THEME_KEY) || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  applyTheme(savedTheme);
+  document.getElementById('themeToggle').addEventListener('click', () => {
+    const newTheme = document.documentElement.hasAttribute('data-theme') ? 'light' : 'dark';
+    localStorage.setItem(THEME_KEY, newTheme);
+    applyTheme(newTheme);
+  });
+
+  let timeChart, memoryChart;
+  function getColors() {
+    const isDark = document.documentElement.hasAttribute('data-theme');
+    return {
+      text: isDark ? '#e0e0e0' : '#222',
+      grid: isDark ? '#444' : '#e0e0e0',
+      bg: isDark ? '#1e1e1e' : '#fff',
+      bar1: '#1a73e8',
+      bar2: '#ff8c00',
+      bar3: '#34a853',
+      bar4: '#ea4335'
+    };
+  }
+
+  function updateCharts() {
+    const c = getColors();
+    if (timeChart) {
+      timeChart.options.plugins.legend.labels.color = c.text;
+      timeChart.options.scales.x.ticks.color = c.text;
+      timeChart.options.scales.y.ticks.color = c.text;
+      timeChart.options.scales.x.grid.color = c.grid;
+      timeChart.options.scales.y.grid.color = c.grid;
+      timeChart.update();
+    }
+    if (memoryChart) {
+      memoryChart.options.plugins.legend.labels.color = c.text;
+      memoryChart.options.scales.x.ticks.color = c.text;
+      memoryChart.options.scales.y.ticks.color = c.text;
+      memoryChart.options.scales.x.grid.color = c.grid;
+      memoryChart.options.scales.y.grid.color = c.grid;
+      memoryChart.update();
+    }
+  }
+
+  // Time chart
+  const timeCtx = document.getElementById('timeChart').getContext('2d');
+  timeChart = new Chart(timeCtx, {
+    type: 'bar',
+    data: {
+      labels: ['Binary (.xtc/.trr)', 'Text (.pdb)', 'Text (.lammpstrj)'],
+      datasets: [
+        { label: 'Chemfiles', data: [0.14, 1.52, null], backgroundColor: getColors().bar1 },
+        { label: 'OVITO', data: [null, null, 2.14], backgroundColor: getColors().bar2 },
+        { label: 'MDAnalysis (binary)', data: [0.14, null, null], backgroundColor: getColors().bar3 }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: { legend: { labels: { color: getColors().text } }, title: { display: true, text: 'Postprocessing Time (minutes, 20k frames)', color: getColors().text, font: { size: 14 } } },
+      scales: {
+        y: { beginAtZero: true, title: { display: true, text: 'Time (min)', color: getColors().text }, ticks: { color: getColors().text }, grid: { color: getColors().grid } },
+        x: { title: { display: true, text: 'File Format', color: getColors().text }, ticks: { color: getColors().text }, grid: { color: getColors().grid } }
+      }
+    }
+  });
+
+  // Memory chart
+  const memCtx = document.getElementById('memoryChart').getContext('2d');
+  memoryChart = new Chart(memCtx, {
+    type: 'bar',
+    data: {
+      labels: ['Text (.pdb)', 'Text (.lammpstrj)', 'Binary (.xtc/.trr)'],
+      datasets: [
+        { label: 'Chemfiles', data: [0.50, 0.43, null], backgroundColor: getColors().bar1 },
+        { label: 'MDAnalysis', data: [null, null, 0.55], backgroundColor: getColors().bar3 },
+        { label: 'OVITO (.lammpstrj)', data: [null, 0.45, null], backgroundColor: getColors().bar2 } // approximate from text
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: { legend: { labels: { color: getColors().text } }, title: { display: true, text: 'Peak Memory Usage (GB, 20k frames)', color: getColors().text, font: { size: 14 } } },
+      scales: {
+        y: { beginAtZero: true, title: { display: true, text: 'Memory (GB)', color: getColors().text }, ticks: { color: getColors().text }, grid: { color: getColors().grid } },
+        x: { title: { display: true, text: 'File Format', color: getColors().text }, ticks: { color: getColors().text }, grid: { color: getColors().grid } }
+      }
+    }
+  });
+
+  // Keyboard shortcuts
+  document.addEventListener('keydown', e => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    if (e.key === 't') document.getElementById('themeToggle').click();
+  });
+})();
+</script>
+<script src="socratic.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Installation - MDTransport</title>
+    <meta name="description" content="Installation guide for MDTransport: pip, conda, development, and prerequisites.">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <nav class="nav container">
+            <a href="index.html" class="nav-brand">
+                <svg class="logo" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="32" height="32" rx="6" fill="currentColor"/>
+                    <path d="M8 12h16M8 16h12M8 20h8" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+                </svg>
+                <span>MDTransport</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">Overview</a></li>
+                <li><a href="features.html">Features</a></li>
+                <li><a href="theory.html">Theory</a></li>
+                <li><a href="installation.html" class="active">Installation</a></li>
+                <li><a href="performance.html">Performance</a></li>
+                <li><a href="references.html">References</a></li>
+            </ul>
+            <a href="https://github.com/ShahResearchGroup/MDTransport" class="nav-github" target="_blank" rel="noopener">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+                GitHub
+            </a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="page-header">
+            <div class="container">
+                <h1>Installation</h1>
+                <p class="page-subtitle">Multiple deployment options for diverse environments</p>
+            </div>
+        </section>
+
+        <section class="install-section">
+            <div class="container">
+                <h2 class="section-title">Quick Install</h2>
+                <div class="install-grid">
+                    <article class="install-card">
+                        <header class="install-header">
+                            <h3>PyPI (pip)</h3>
+                            <span class="install-badge">Recommended</span>
+                        </header>
+                        <pre><code>pip install MDTransport</code></pre>
+                        <p>Installs the latest stable release with all core dependencies.</p>
+                    </article>
+                    <article class="install-card">
+                        <header class="install-header">
+                            <h3>Conda (conda-forge)</h3>
+                        </header>
+                        <pre><code>conda install -c conda-forge mdtransport</code></pre>
+                        <p>Best for conda environments; handles non-Python dependencies automatically.</p>
+                    </article>
+                    <article class="install-card">
+                        <header class="install-header">
+                            <h3>Development (editable)</h3>
+                        </header>
+                        <pre><code>git clone https://github.com/ShahResearchGroup/MDTransport.git
+cd MDTransport
+pip install -e .</code></pre>
+                        <p>For contributors or testing latest changes. Links source directly.</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="install-section bg-muted">
+            <div class="container">
+                <h2 class="section-title">Alternative Deployment</h2>
+                <div class="alt-install-grid">
+                    <article class="alt-install-card">
+                        <div class="alt-icon desktop">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"></rect><path d="M8 21h8"></path><path d="M12 17v4"></path></svg>
+                        </div>
+                        <h3>Desktop Application</h3>
+                        <p>Cross-platform GUI installer for Windows, macOS, Linux. No command-line needed.</p>
+                        <a href="https://shahresearchgroup.org" class="btn btn-secondary" target="_blank" rel="noopener">Download from Shah Research Group</a>
+                    </article>
+                    <article class="alt-install-card">
+                        <div class="alt-icon web">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                        </div>
+                        <h3>Web Interface</h3>
+                        <p>Browser-based — no installation. Upload trajectories, run analysis, download results.</p>
+                        <a href="https://shahresearchgroup.org" class="btn btn-secondary" target="_blank" rel="noopener">Launch Web App</a>
+                    </article>
+                    <article class="alt-install-card">
+                        <div class="alt-icon source">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
+                        </div>
+                        <h3>Run from Source (no install)</h3>
+                        <p>Execute directly from cloned repository without PyPI/Conda installation.</p>
+                        <pre><code>git clone https://github.com/ShahResearchGroup/MDTransport.git
+cd MDTransport
+python mdt.py</code></pre>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="install-section">
+            <div class="container">
+                <h2 class="section-title">Prerequisites</h2>
+                <div class="prereq-grid">
+                    <article class="prereq-card">
+                        <h3>Core Python Packages</h3>
+                        <ul class="package-list">
+                            <li><code>numpy</code> ≥ 1.21</li>
+                            <li><code>scipy</code> ≥ 1.7</li>
+                            <li><code>pandas</code> ≥ 1.3</li>
+                            <li><code>matplotlib</code> ≥ 3.4</li>
+                            <li><code>tqdm</code> ≥ 4.62</li>
+                        </ul>
+                        <p class="note">All installed automatically via pip/conda.</p>
+                    </article>
+                    <article class="prereq-card">
+                        <h3>Optional Backend Libraries</h3>
+                        <p>For enhanced binary format support, multiprocessing, and memory efficiency:</p>
+                        <ul class="package-list">
+                            <li><code>MDAnalysis</code> — <code>pip install MDAnalysis</code></li>
+                            <li><code>chemfiles</code> — <code>pip install chemfiles</code></li>
+                            <li><code>ovito</code> — <code>conda install -c conda-forge ovito</code></li>
+                        </ul>
+                        <p class="note">MDTransport auto-detects available backends. Flags: <code>--mda</code>, <code>--chem</code>, <code>--ovito</code>, <code>--exe</code>.</p>
+                    </article>
+                    <article class="prereq-card">
+                        <h3>System Requirements</h3>
+                        <ul>
+                            <li>Python ≥ 3.8</li>
+                            <li>Linux / macOS / Windows</li>
+                            <li>Multi-core CPU recommended</li>
+                            <li>RAM: 4 GB minimum; 16 GB+ for large trajectories</li>
+                        </ul>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="install-section bg-muted">
+            <div class="container">
+                <h2 class="section-title">Verification</h2>
+                <div class="verify-grid">
+                    <div class="verify-card">
+                        <h3>Test Installation</h3>
+                        <pre><code>mdt -h</code></pre>
+                        <p>Shows help with all available flags and commands.</p>
+                    </div>
+                    <div class="verify-card">
+                        <h3>Run Example</h3>
+                        <pre><code>cd MDTransport/sample
+mdt --msd --ne --rdf \
+  --traj gromacs/traj.xtc \
+  --top gromacs/topol.tpr \
+  --t_steps 20</code></pre>
+                        <p>Sample data included in repo (<code>sample/gromacs/</code>, <code>sample/lammps/</code>).</p>
+                    </div>
+                    <div class="verify-card">
+                        <h3>View Examples</h3>
+                        <pre><code>mdt -e</code></pre>
+                        <p>Prints complete example commands for each analysis type.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="install-section">
+            <div class="container">
+                <h2 class="section-title">HPC / Cluster Installation</h2>
+                <div class="hpc-content">
+                    <h3>Module-based Environments</h3>
+                    <pre><code># Load Python and create virtual environment
+module load python/3.10
+python -m venv mdt_env
+source mdt_env/bin/activate
+pip install MDTransport
+
+# Optional: install backends
+pip install MDAnalysis chemfiles</code></pre>
+                    <h3>Container (Docker/Singularity)</h3>
+                    <pre><code># Docker
+docker run -it python:3.10-slim bash -c "pip install MDTransport && mdt -h"
+
+# Singularity (HPC-friendly)
+singularity pull docker://python:3.10-slim
+singularity exec python_3.10.sif pip install MDTransport</code></pre>
+                    <h3>Environment Variables</h3>
+                    <pre><code># Control multiprocessing
+export MDT_N_CORES=8
+export MDT_MP_MODE=forkserver  # or spawn, fork
+
+# Enable disk-backed mode by default
+export MDT_DISK=1</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <section class="install-section bg-muted">
+            <div class="container">
+                <h2 class="section-title">Troubleshooting</h2>
+                <div class="troubleshoot-grid">
+                    <details class="trouble-item">
+                        <summary>ImportError: No module named 'MDTransport'</summary>
+                        <p>Ensure you're using the same Python environment where you installed. Check with <code>pip list | grep MDTransport</code>. For conda, use <code>conda list mdtransport</code>.</p>
+                    </details>
+                    <details class="trouble-item">
+                        <summary>Trajectory format not supported (.xtc, .trr, .lammpstrj)</summary>
+                        <p>Install MDAnalysis, chemfiles, or ovito. MDTransport auto-detects: <code>pip install MDAnalysis chemfiles</code>. For OVITO on Linux: <code>conda install -c conda-forge ovito</code>.</p>
+                    </details>
+                    <details class="trouble-item">
+                        <summary>MemoryError on large trajectories</summary>
+                        <p>Use <code>--disk</code> flag for disk-backed processing. Reduce <code>--n_cores</code>. Use binary formats (.xtc) with MDAnalysis/chemfiles for lower memory.</p>
+                    </details>
+                    <details class="trouble-item">
+                        <summary>Multiprocessing hangs or fails</summary>
+                        <p>Try <code>--mp_mode spawn</code> (default on Windows/macOS) or <code>--mp_mode forkserver</code>. Reduce <code>--n_cores</code>. Some HPC systems require <code>spawn</code>.</p>
+                    </details>
+                    <details class="trouble-item">
+                        <summary>GROMACS .tpr topology not read</summary>
+                        <p>Ensure GROMACS is in PATH for native parsing, or install MDAnalysis: <code>pip install MDAnalysis</code>. Use <code>--mda</code> flag to force MDAnalysis backend.</p>
+                    </details>
+                    <details class="trouble-item">
+                        <summary>LAMMPS timestep/dump frame confusion</summary>
+                        <p>For LAMMPS: <code>--t_steps</code> = integration timestep (e.g., 1 fs = 0.001 ps), <code>--dump_frame</code> = dump frequency. MDTransport computes dt = t_steps × dump_frame. All time params in ps.</p>
+                    </details>
+                </div>
+            </div>
+        </section>
+
+        <section class="install-section">
+            <div class="container">
+                <h2 class="section-title">Updating</h2>
+                <div class="update-grid">
+                    <div class="update-card">
+                        <h3>PyPI</h3>
+                        <pre><code>pip install --upgrade MDTransport</code></pre>
+                    </div>
+                    <div class="update-card">
+                        <h3>Conda</h3>
+                        <pre><code>conda update mdtransport</code></pre>
+                    </div>
+                    <div class="update-card">
+                        <h3>Development</h3>
+                        <pre><code>cd MDTransport
+git pull
+pip install -e .</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-links">
+                    <a href="index.html">Overview</a>
+                    <a href="features.html">Features</a>
+                    <a href="theory.html">Theory</a>
+                    <a href="installation.html">Installation</a>
+                    <a href="performance.html">Performance</a>
+                    <a href="references.html">References</a>
+                </div>
+                <p class="footer-license">Licensed under GNU GPL v3.0 · © 2026 The Authors</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

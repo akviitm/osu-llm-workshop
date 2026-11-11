@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MDTransport: Presentation</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            line-height: 1.6;
+            color: #1a1a2e;
+            background: #f8f9fa;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        header h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 0.5rem;
+        }
+        
+        header .subtitle {
+            font-size: 1.1rem;
+            color: #555;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        header .meta {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 0;
+        }
+        
+        .tab-btn {
+            padding: 1rem 2rem;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            bottom: -2px;
+        }
+        
+        .tab-btn:hover {
+            color: #2c3e50;
+            background: #f0f2f5;
+        }
+        
+        .tab-btn.active {
+            color: #2c3e50;
+            border-bottom-color: #2c3e50;
+            background: #fff;
+        }
+        
+        .tab-panel {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .tab-panel.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .section {
+            margin-bottom: 2.5rem;
+        }
+        
+        .section h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e8e8e8;
+        }
+        
+        .section h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 1.5rem 0 0.75rem;
+        }
+        
+        .section p {
+            margin-bottom: 1rem;
+            color: #333;
+        }
+        
+        .section ul, .section ol {
+            margin: 0.5rem 0 1rem 1.5rem;
+        }
+        
+        .section li {
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+        
+        .highlight-box {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        
+        .highlight-box h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 0.75rem;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        
+        .card {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: box-shadow 0.2s ease;
+        }
+        
+        .card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        
+        .card h4 {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 0.75rem;
+        }
+        
+        .card p {
+            font-size: 0.95rem;
+            color: #555;
+            margin: 0;
+        }
+        
+        .badge {
+            display: inline-block;
+            background: #e8f0fe;
+            color: #1a73e8;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .badge.green {
+            background: #e6f4ea;
+            color: #1e8e3e;
+        }
+        
+        .badge.orange {
+            background: #fef3e2;
+            color: #e67e22;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            margin: 1.5rem 0;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        
+        th, td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e8e8e8;
+        }
+        
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #1a1a2e;
+            font-size: 0.9rem;
+        }
+        
+        td {
+            font-size: 0.9rem;
+            color: #333;
+        }
+        
+        tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .check {
+            color: #1e8e3e;
+            font-weight: bold;
+        }
+        
+        .cross {
+            color: #999;
+        }
+        
+        .formula {
+            background: #f8f9fa;
+            border: 1px solid #e8e8e8;
+            border-radius: 6px;
+            padding: 1rem;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+        
+        .key-takeaway {
+            background: linear-gradient(135deg, #2c3e50 0%, #1a1a2e 100%);
+            color: #fff;
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .key-takeaway h3 {
+            color: #fff;
+            margin-bottom: 1rem;
+        }
+        
+        .key-takeaway ul {
+            margin-left: 1.5rem;
+        }
+        
+        .key-takeaway li {
+            color: #e0e0e0;
+            margin-bottom: 0.5rem;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: #888;
+            font-size: 0.85rem;
+            border-top: 1px solid #e0e0e0;
+            margin-top: 3rem;
+        }
+        
+        /* Figure styles */
+        .figure {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1.5rem 0;
+            text-align: center;
+        }
+        
+        .figure img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        
+        .figure figcaption {
+            margin-top: 0.75rem;
+            font-size: 0.85rem;
+            color: #666;
+            font-style: italic;
+        }
+        
+        .figure-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        
+        .figure-row .figure {
+            margin: 0;
+        }
+        
+        @media (max-width: 640px) {
+            .tab-btn {
+                padding: 0.75rem 1rem;
+                font-size: 0.9rem;
+            }
+            
+            header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .container {
+                padding: 1.5rem 1rem;
+            }
+            
+            .figure-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>MDTransport</h1>
+            <p class="subtitle">A Modular, Open-Source, Extensible Python Tool for Computing Transport Properties from GROMACS and LAMMPS Simulations</p>
+            <p class="meta">Verma, Thorat &amp; Shah (2026) · J. Chem. Inf. Model. 66, 9989–10003 · <a href="https://doi.org/10.1021/acs.jcim.6c00558" target="_blank" style="color: #1a73e8;">DOI: 10.1021/acs.jcim.6c00558</a></p>
+        </header>
+        
+        <nav class="tabs" role="tablist">
+            <button class="tab-btn active" role="tab" aria-selected="true" data-tab="scope">Current Scope</button>
+            <button class="tab-btn" role="tab" aria-selected="false" data-tab="hypothesis">Hypothesis &amp; Objectives</button>
+            <button class="tab-btn" role="tab" aria-selected="false" data-tab="future">Future Direction</button>
+        </nav>
+        
+        <!-- TAB 1: CURRENT SCOPE -->
+        <section class="tab-panel active" role="tabpanel" id="scope" aria-labelledby="scope-tab">
+            <div class="section">
+                <h2>What MDTransport Does Today</h2>
+                <p>MDTransport is a comprehensive postprocessing framework for molecular dynamics trajectories from <strong>GROMACS</strong> and <strong>LAMMPS</strong>. It computes a wide range of transport properties and advanced structural-dynamical analyses through a unified, user-accessible interface.</p>
+            </div>
+            
+            <!-- Figure 1: Package Structure & Workflow -->
+            <div class="section">
+                <h2>Package Structure &amp; Workflow (Figure 1 &amp; 2 from Paper)</h2>
+                <div class="figure-row">
+                    <div class="figure">
+                        <img src="fig_page2_img1.png" alt="Figure 1: MDTransport package structure and main script execution">
+                        <figcaption>Figure 1: (a) Structure of the MDTransport package including main script and modules. (b) Main script executing GROMACS and LAMMPS analysis.</figcaption>
+                    </div>
+                    <div class="figure">
+                        <img src="fig_page3_img1.png" alt="Figure 2: MDTransport workflow schematic">
+                        <figcaption>Figure 2: Schematic representation of the MDTransport workflow, illustrating how trajectory data from GROMACS and LAMMPS are processed to extract species center-of-mass, charges, and counts for subsequent transport analyses.</figcaption>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>Transport Properties Computed</h2>
+                <div class="grid">
+                    <div class="card">
+                        <h4>Self-Diffusion Coefficients</h4>
+                        <p>MSD-based with adaptive fitting (OLS/WLS/GLS); direction-specific (x, y, z); fragment-level analysis</p>
+                    </div>
+                    <div class="card">
+                        <h4>Ionic Conductivity</h4>
+                        <p>Nernst–Einstein, Einstein, and Einstein–Helfand formalisms; self + cross-correlation decomposition</p>
+                    </div>
+                    <div class="card">
+                        <h4>Transference Numbers</h4>
+                        <p>Ideal (Nernst–Einstein) and real (Einstein, with ion–ion correlations)</p>
+                    </div>
+                    <div class="card">
+                        <h4>Onsager Transport Coefficients</h4>
+                        <p>Self and cross terms; convertible to ionic conductivity via σ = Nₐe²zᵢzⱼLᵢⱼ</p>
+                    </div>
+                    <div class="card">
+                        <h4>Stefan–Maxwell Diffusivity</h4>
+                        <p>Multicomponent diffusion coefficients; resistance matrix for conductivity</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>Advanced Analyses (Key Differentiators)</h2>
+                <div class="grid">
+                    <div class="card">
+                        <h4>Ion–Ion Correlation</h4>
+                        <p>Self, intracomponent (cation–cation, anion–anion), intercomponent (cation–anion) cross-correlations via Einstein and EH formalisms</p>
+                    </div>
+                    <div class="card">
+                        <h4>Spatial Decomposition (SPDA)</h4>
+                        <p>Proximal (within solvation shell) vs. distant contributions; fixed &amp; variable identity approaches; auto RDF-based cutoff</p>
+                    </div>
+                    <div class="card">
+                        <h4>Cage Correlation Lifetimes</h4>
+                        <p>Intermittent cage persistence via Heaviside function; multi-exponential fitting; auto RDF-derived cutoff</p>
+                    </div>
+                    <div class="card">
+                        <h4>Pair Correlation Lifetimes</h4>
+                        <p>Nearest-neighbor tracking; intermittent reforming allowed; first-point exclusion for robust fitting</p>
+                    </div>
+                    <div class="card">
+                        <h4>Cluster Analysis</h4>
+                        <p>Population distribution within solvation shells; agglomeration vs. solvation diagnostics</p>
+                    </div>
+                    <div class="card">
+                        <h4>Transport Mechanism</h4>
+                        <p>Vehicular diffusion vs. structural hopping classification via l<sub>D,ij</sub> / l<sub>s</sub> ratio</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>Structural Analysis</h2>
+                <ul>
+                    <li><strong>Radial Distribution Functions:</strong> COM–COM, atom–atom, atom–COM modes; auto peak/solvation shell/coordination number extraction (<code>--ana</code>)</li>
+                    <li><strong>Periodic Boundary Handling:</strong> Minimum image convention reconstruction + drift removal (COM of whole box subtracted per frame)</li>
+                    <li><strong>Species Identification:</strong> Automatic from GROMACS <code>.tpr/.gro/.pdb/.itp</code>; LAMMPS via <code>--species</code> flag</li>
+                </ul>
+            </div>
+            
+            <div class="section">
+                <h2>Architecture &amp; Interfaces</h2>
+                <div class="grid">
+                    <div class="card">
+                        <h4>Prompt-Based CLI</h4>
+                        <p>Interactive stepwise prompts for novices; single-command flags for experts; <code>-h</code> help, <code>-e</code> examples</p>
+                    </div>
+                    <div class="card">
+                        <h4>Desktop Application</h4>
+                        <p>Cross-platform GUI for local execution (available via Shah Research Group website)</p>
+                    </div>
+                    <div class="card">
+                        <h4>Cloud Web Interface</h4>
+                        <p>Browser-based analysis, no installation required (hosted at <a href="https://shahresearchgroup.org" target="_blank">shahresearchgroup.org</a>)</p>
+                    </div>
+                </div>
+                
+                <div class="section" style="margin-top: 1.5rem;">
+                    <h3>Cloud Web Interface Details (from shahresearchgroup.org)</h3>
+                    <div class="grid">
+                        <div class="card">
+                            <h4>🚀 Quick Guest Access</h4>
+                            <p>Start instantly with a temporary session — no account required. Secure sessions last up to 20 minutes. Load sample files or upload your own. All data is deleted after the session ends.</p>
+                        </div>
+                        <div class="card">
+                            <h4>🔬 Run Locally Option</h4>
+                            <p>For users who prefer local execution, the web interface provides download links for the desktop application and source code, with seamless transition between cloud and local workflows.</p>
+                        </div>
+                        <div class="card">
+                            <h4>💬 Ask MDTransport</h4>
+                            <p>Interactive help/chat feature integrated into the web interface for real-time assistance with analysis setup, parameter selection, and result interpretation.</p>
+                        </div>
+                        <div class="card">
+                            <h4>📥 Downloads &amp; Documentation</h4>
+                            <p>Direct access to source code (GitHub), PyPI/Conda packages, comprehensive documentation, tutorial notebooks, and example datasets — all from the web portal.</p>
+                        </div>
+                        <div class="card">
+                            <h4>🔐 User Accounts</h4>
+                            <p>Optional account creation for persistent sessions, saved analysis configurations, history tracking, and collaboration features. Login via institutional or email credentials.</p>
+                        </div>
+                        <div class="card">
+                            <h4>🛡️ Security &amp; Privacy</h4>
+                            <p>Secure HTTPS sessions; uploaded trajectories processed server-side; automatic data deletion after session expiry; no persistent storage without explicit user consent.</p>
+                        </div>
+                    </div>
+                    <p><strong>Access URL:</strong> <a href="https://shahresearchgroup.org" target="_blank">https://shahresearchgroup.org</a> → Navigate to MDTransport section for web interface, downloads, and documentation.</p>
+                </div>
+
+                <p><strong>Backend Parsers:</strong> MDAnalysis, Chemfiles, OVITO, built-in PDB parser — supports <code>.xtc, .trr, .tpr, .gro, .pdb, .lammpstrj, .dcd, .data</code></p>
+                <p><strong>Performance:</strong> Multiprocessing (all cores by default, configurable via <code>--n_cores</code>); disk-backed mode (<code>--disk</code>) reduces peak memory ~50%; FFT-accelerated O(N log N) correlation calculations</p>
+            </div>
+            
+            <!-- Figure 3: Performance Benchmarks -->
+            <div class="section">
+                <h2>Computational Performance Benchmarks (Figure 3 &amp; 4 from Paper)</h2>
+                <div class="figure-row">
+                    <div class="figure">
+                        <img src="fig_page12_img1.png" alt="Figure 3: Postprocessing time comparison across formats, parsers, and hardware">
+                        <figcaption>Figure 3: Comparison of postprocessing time for calculating Einstein ionic conductivity of a 500 ion-pair [C₂mim][BF₄] system across a 100 ns simulation trajectory. (a) 20001 snapshots in .xtc format, (b) PDB format, (c) XTC format detail, (d) time scaling by varying snapshots.</figcaption>
+                    </div>
+                    <div class="figure">
+                        <img src="fig_page13_img1.png" alt="Figure 4: Memory usage benchmarks">
+                        <figcaption>Figure 4: Computational performance benchmarks across trajectory file formats: (a) Total postprocessing execution time, (b) Peak memory consumption, (c) 1M atom system memory usage (in-memory vs disk-backed), (d) 12.5k atom system comparison.</figcaption>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>Validation &amp; Benchmarks</h2>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Property</th>
+                                <th>MDTransport</th>
+                                <th>GROMACS</th>
+                                <th>MDAnalysis</th>
+                                <th>PyLAT</th>
+                                <th>STACIE</th>
+                                <th>TRAVIS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>MSD &amp; Self-Diffusion</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td></tr>
+                            <tr><td>Ionic Conductivity (Nernst–Einstein)</td><td class="check">✓</td><td class="check">✓</td><td class="cross">✗</td><td class="check">✓</td><td class="check">✓</td><td class="cross">✗</td></tr>
+                            <tr><td>Ionic Conductivity (Einstein)</td><td class="check">✓</td><td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td><td class="check">✓</td><td class="cross">✗</td></tr>
+                            <tr><td>Ion–Ion Correlations</td><td class="check">✓</td><td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td><td class="check">✓</td><td class="cross">✗</td></tr>
+                            <tr><td>Spatial Decomposition (SPDA)</td><td class="check">✓</td><td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td></tr>
+                            <tr><td>Cage/Pair Lifetimes</td><td class="check">✓</td><td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td></tr>
+                            <tr><td>Cluster Analysis</td><td class="check">✓</td><td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td></tr>
+                            <tr><td>Transport Mechanism</td><td class="check">✓</td><td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td></tr>
+                            <tr><td>Onsager Coefficients</td><td class="check">✓</td><td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td></tr>
+                            <tr><td>Stefan–Maxwell Diffusivity</td><td class="check">✓</td><td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td></tr>
+                            <tr><td>GROMACS + LAMMPS Support</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td><td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p style="font-size: 0.85rem; color: #666;">Table adapted from paper Table 2. MDTransport is the only tool covering all listed properties across both major MD engines.</p>
+            </div>
+            
+            <div class="key-takeaway">
+                <h3>Why Use MDTransport?</h3>
+                <ul>
+                    <li><strong>Unified framework:</strong> One tool for all major transport properties — no switching between PyLAT, TRAVIS, GROMACS tools, custom scripts</li>
+                    <li><strong>Dual-engine native:</strong> Processes both GROMACS and LAMMPS trajectories with identical APIs</li>
+                    <li><strong>Advanced analyses built-in:</strong> Cage/pair lifetimes, SPDA, transport mechanism — unique capabilities not found elsewhere</li>
+                    <li><strong>Accessible to all skill levels:</strong> Prompt-based CLI for beginners, flag-driven for experts, desktop/web GUI for non-programmers</li>
+                    <li><strong>High-throughput ready:</strong> Automated adaptive fitting, multiprocessing, disk-backed mode, minimal manual intervention</li>
+                    <li><strong>Reproducible:</strong> Standardized best-practice methodologies reduce user bias and uncertainty</li>
+                    <li><strong>Open &amp; extensible:</strong> GPL licensed, modular class-based design, plug-and-play property modules</li>
+                </ul>
+            </div>
+        </section>
+        
+        <!-- TAB 2: HYPOTHESIS & OBJECTIVES -->
+        <section class="tab-panel" role="tabpanel" id="hypothesis" aria-labelledby="hypothesis-tab">
+            <div class="section">
+                <h2>The Research Gap (Hypothesis)</h2>
+                <div class="highlight-box">
+                    <h4>Core Hypothesis</h4>
+                    <p><strong>Existing postprocessing tools for MD trajectories are fragmented, engine-specific, and lack advanced transport analyses — creating a barrier for reproducible, high-throughput materials screening.</strong></p>
+                </div>
+                
+                <h3>Specific Pain Points Identified</h3>
+                <div class="grid">
+                    <div class="card">
+                        <h4>Engine Lock-In</h4>
+                        <p>PyLAT → LAMMPS only; GROMACS tools → GROMACS only. Researchers using both engines must master multiple toolchains.</p>
+                    </div>
+                    <div class="card">
+                        <h4>Limited Property Coverage</h4>
+                        <p>Most tools compute only MSD/diffusion and basic RDFs. Advanced analyses (cage lifetimes, SPDA, transport mechanism, Onsager coefficients) require custom scripting.</p>
+                    </div>
+                    <div class="card">
+                        <h4>Expertise Barrier</h4>
+                        <p>MDAnalysis, MDTraj, Chemfiles, OVITO demand Python proficiency. PyLAT has steep learning curve. Non-programmers excluded.</p>
+                    </div>
+                    <div class="card">
+                        <h4>High-Throughput Unsuitable</h4>
+                        <p>Manual time-window selection, no automated convergence, memory bottlenecks, single-engine focus — impractical for screening campaigns.</p>
+                    </div>
+                    <div class="card">
+                        <h4>Reproducibility Issues</h4>
+                        <p>User-chosen fitting windows introduce bias. No standardized best-practice enforcement across tools.</p>
+                    </div>
+                    <div class="card">
+                        <h4>Topology/Charge Gaps</h4>
+                        <p>MDTraj/OVITO lack native charge extraction from <code>.tpr</code>/<code>.data</code> files — critical for conductivity.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>Objectives of MDTransport</h2>
+                <ol>
+                    <li><strong>Unify GROMACS &amp; LAMMPS postprocessing</strong> in a single codebase with identical user-facing APIs</li>
+                    <li><strong>Implement the full transport property stack:</strong> MSD, self-diffusion, Nernst–Einstein/Einstein/EH conductivity, transference numbers, Onsager coefficients, Stefan–Maxwell diffusivity</li>
+                    <li><strong>Deliver advanced analyses unavailable elsewhere:</strong> ion–ion correlation decomposition, spatial decomposition (SPDA), cage/pair correlation lifetimes, cluster analysis, transport mechanism classification</li>
+                    <li><strong>Provide three-tier accessibility:</strong> prompt-based CLI (HPC), desktop app (local), web interface (browser) — serving novices to experts</li>
+                    <li><strong>Automate best practices:</strong> adaptive diffusive-regime detection, multi-exponential lifetime fitting, RDF-derived cutoffs, drift removal — minimizing user bias</li>
+                    <li><strong>Enable high-throughput screening:</strong> multiprocessing, disk-backed memory management, binary format support, minimal manual intervention</li>
+                    <li><strong>Ensure reproducibility &amp; openness:</strong> GPL license, comprehensive documentation, validation against known systems, modular extensible architecture</li>
+                </ol>
+            </div>
+            
+            <div class="section">
+                <h2>Key Methodological Choices</h2>
+                <div class="grid">
+                    <div class="card">
+                        <h4>Adaptive Diffusive Regime Detection</h4>
+                        <p>Analyzes β = d(ln MSD)/d(ln t) over ≥8 ns windows (or ½ trajectory); selects window minimizing ∑|β−1| across all species; warns if tolerance (δ=0.075) exceeded</p>
+                    </div>
+                    <div class="card">
+                        <h4>FFT-Accelerated Correlations</h4>
+                        <p>Position autocorrelation and dipole autocorrelation via FFT → O(N log N) scaling; enables full-trajectory sliding windows for EH formalism</p>
+                    </div>
+                    <div class="card">
+                        <h4>Einstein–Helfand Formalism</h4>
+                        <p>Collective dipole displacement instead of pairwise sums → massive speedup for cross-correlations &amp; Onsager coefficients; enables long sliding windows</p>
+                    </div>
+                    <div class="card">
+                        <h4>Modular Class-Based Design</h4>
+                        <p>Each property in <code>utils_&lt;property&gt;.py</code>; new properties added by creating new class — no core modification needed</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>Validation Results Summary</h2>
+                <ul>
+                    <li><strong>Systems tested:</strong> 64 &amp; 500 ion-pair [C₂mim][BF₄], [C₂mim][NTf₂], salt solutions</li>
+                    <li><strong>Diffusion coefficients:</strong> Match literature values within statistical uncertainty</li>
+                    <li><strong>Einstein vs. EH conductivity:</strong> Identical results within any time window (validates both formalisms)</li>
+                    <li><strong>SPDA fixed vs. variable:</strong> Sum of proximal + distant = total cross-correlation (fixed); exchange terms appear (variable)</li>
+                    <li><strong>Performance:</strong> 100 ns / 500 ion-pair / 20001 frames → ~1–2 min (8 cores, MDAnalysis, .xtc); disk mode cuts peak RAM ~50%</li>
+                </ul>
+            </div>
+        </section>
+        
+        <!-- TAB 3: FUTURE DIRECTION -->
+        <section class="tab-panel" role="tabpanel" id="future" aria-labelledby="future-tab">
+            <div class="section">
+                <h2>Stated Future Work (from Paper)</h2>
+                <div class="highlight-box">
+                    <h4>Direct Quote from Conclusion</h4>
+                    <p>"Further development is underway to incorporate alternative methods to compute transport properties efficiently. Additionally, future work will involve introducing functionality by integrating additional transport properties and extending postprocessing capabilities to ab initio molecular dynamics packages such as CP2K."</p>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>Roadmap: Near-Term Extensions</h2>
+                <div class="grid">
+                    <div class="card">
+                        <h4><span class="badge green">Planned</span> Green–Kubo Formalism</h4>
+                        <p>Velocity autocorrelation-based conductivity &amp; viscosity; complement Einstein/EH approaches; noise reduction via spectral methods (cf. KUTE, SporTran)</p>
+                    </div>
+                    <div class="card">
+                        <h4><span class="badge green">Planned</span> Thermal Transport</h4>
+                        <p>Thermal conductivity via Green–Kubo / EH heat flux autocorrelation; non-equilibrium MD (NEMD) support</p>
+                    </div>
+                    <div class="card">
+                        <h4><span class="badge green">Planned</span> Shear Viscosity</h4>
+                        <p>Stress tensor autocorrelation (Green–Kubo); periodic perturbation (NEMD); connect to Stokes–Einstein relation</p>
+                    </div>
+                    <div class="card">
+                        <h4><span class="badge green">Planned</span> Rigorous Uncertainty Quantification</h4>
+                        <p>Block bootstrap, Bayesian inference (cf. Kinisi, STACIE); automated convergence diagnostics; confidence intervals on all reported properties</p>
+                    </div>
+                    <div class="card">
+                        <h4><span class="badge green">Planned</span> CP2K / Ab Initio MD Support</h4>
+                        <p>Parse CP2K trajectories (<code>.xyz</code>, <code>.ener</code>, <code>.restart</code>); handle variable cell geometries; DFT-level charge analysis</p>
+                    </div>
+                    <div class="card">
+                        <h4><span class="badge green">Planned</span> OpenMM / AMBER / CHARMM Support</h4>
+                        <p>Extend engine compatibility beyond GROMACS/LAMMPS; unified topology handling via OpenMM XML / AMBER prmtop</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>Roadmap: Architectural &amp; Usability Improvements</h2>
+                <div class="grid">
+                    <div class="card">
+                        <h4>Python Package &amp; API</h4>
+                        <p>Formal <code>import mdtransport</code> programmatic API (beyond CLI); Jupyter notebook integration; type hints, full docstrings</p>
+                    </div>
+                    <div class="card">
+                        <h4>GPU Acceleration</h4>
+                        <p>CuPy / JAX backends for FFT &amp; correlation computations; large-system scaling (>1M atoms)</p>
+                    </div>
+                    <div class="card">
+                        <h4>Distributed Computing</h4>
+                        <p>Dask / MPI support for multi-node HPC; trajectory sharding; distributed reduction of correlation arrays</p>
+                    </div>
+                    <div class="card">
+                        <h4>Interactive Visualization</h4>
+                        <p>Embedded Plotly/Dash dashboards in web UI; live MSD/RDF/correlation plots; export publication-ready figures</p>
+                    </div>
+                    <div class="card">
+                        <h4>Workflow Integration</h4>
+                        <p>FireWorks / AiiDA / Parsl plugins; automatic metadata capture (provenance); REST API for web service</p>
+                    </div>
+                    <div class="card">
+                        <h4>Force-Field Agnostic Charges</h4>
+                        <p>Support for charge equilibration (QEq), DFT-derived charges (RESP, CHELPG), topological quantization (Grasselli–Baroni)</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>Roadmap: Advanced Analyses</h2>
+                <div class="grid">
+                    <div class="card">
+                        <h4>Collective Variable Analysis</h4>
+                        <p>Metadynamics/umbrella sampling postprocessing; free energy surfaces from biased trajectories</p>
+                    </div>
+                    <div class="card">
+                        <h4>Interfacial Transport</h4>
+                        <p>Slab geometry support; directional diffusion (⊥/∥ interface); surface conductivity; electrochemical double layer</p>
+                    </div>
+                    <div class="card">
+                        <h4>Polarizable Force Fields</h4>
+                        <p>Drude oscillator / AMOEBA support; induced dipole contributions to conductivity; EH formalism extension</p>
+                    </div>
+                    <div class="card">
+                        <h4>Machine Learning Surrogates</h4>
+                        <p>Train ML models on MDTransport outputs for rapid property prediction; active learning loops for screening</p>
+                    </div>
+                    <div class="card">
+                        <h4>Non-Equilibrium Transport</h4>
+                        <p>Electric field-driven NEMD; electro-osmotic flow; transient current response; frequency-dependent conductivity</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>Community &amp; Ecosystem</h2>
+                <ul>
+                    <li><strong>Plugin Architecture:</strong> Third-party property modules via entry points (<code>mdtransport.plugins</code>)</li>
+                    <li><strong>Benchmark Suite:</strong> Standardized test systems (ionic liquids, polymers, batteries, biophysics) with reference values</li>
+                    <li><strong>Education:</strong> Tutorial notebooks, workshop materials, video guides for classroom adoption</li>
+                    <li><strong>Publication Integration:</strong> Direct export to <code>.cif</code>, <code>.json</code> for materials databases (MP, OQMD, NOMAD)</li>
+                    <li><strong>CI/CD:</strong> Automated regression testing on new GROMACS/LAMMPS/CP2K releases</li>
+                </ul>
+            </div>
+            
+            <div class="key-takeaway">
+                <h3>Vision</h3>
+                <p>MDTransport aims to become the <strong>standard postprocessing backbone</strong> for computational electrolyte and transport materials discovery — bridging the gap between raw MD trajectories and publication-ready, reproducible transport property datasets across all major simulation engines and accuracy tiers (classical → ab initio).</p>
+            </div>
+        </section>
+    </div>
+    
+    <footer>
+        MDTransport Presentation · Based on Verma, Thorat &amp; Shah (2026) · <a href="https://github.com/ShahResearchGroup/MDTransport" target="_blank" style="color: #1a73e8;">GitHub Repository</a> · <a href="https://shahresearchgroup.org" target="_blank" style="color: #1a73e8;">Shah Research Group</a>
+    </footer>
+    
+    <script>
+        // Tab switching logic
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabPanels = document.querySelectorAll('.tab-panel');
+        
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const target = btn.dataset.tab;
+                
+                // Update buttons
+                tabBtns.forEach(b => {
+                    b.classList.remove('active');
+                    b.setAttribute('aria-selected', 'false');
+                });
+                btn.classList.add('active');
+                btn.setAttribute('aria-selected', 'true');
+                
+                // Update panels
+                tabPanels.forEach(panel => {
+                    panel.classList.remove('active');
+                });
+                document.getElementById(target).classList.add('active');
+            });
+        });
+        
+        // Keyboard navigation
+        tabBtns.forEach((btn, idx) => {
+            btn.addEventListener('keydown', (e) => {
+                let newIdx = idx;
+                if (e.key === 'ArrowRight') newIdx = (idx + 1) % tabBtns.length;
+                else if (e.key === 'ArrowLeft') newIdx = (idx - 1 + tabBtns.length) % tabBtns.length;
+                else return;
+                tabBtns[newIdx].focus();
+                tabBtns[newIdx].click();
+            });
+        });
+    </script>
+</body>
+</html>

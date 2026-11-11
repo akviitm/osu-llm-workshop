@@ -1,0 +1,644 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Advanced Topics: Force Fields &amp; Property Calculation</title>
+<style>
+:root {
+  --banner-bg: #e86c00;
+  --banner-text: #fff;
+  --primary: #2c3e50;
+  --accent: #1a73e8;
+  --accent-hover: #155ab6;
+  --bg: #fafafa;
+  --card-bg: #fff;
+  --border: #e0e0e0;
+  --text: #222;
+  --muted: #666;
+  --socratic-bg: #f0f7ff;
+  --socratic-border: #1a73e8;
+  --code-bg: #1e1e1e;
+  --code-text: #d4d4d4;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --banner-bg: #ff8c00;
+    --banner-text: #000;
+    --primary: #e0e0e0;
+    --accent: #64b5f6;
+    --accent-hover: #90caf9;
+    --bg: #121212;
+    --card-bg: #1e1e1e;
+    --border: #333;
+    --text: #e0e0e0;
+    --muted: #aaa;
+    --socratic-bg: #0d1b2a;
+    --socratic-border: #64b5f6;
+    --code-bg: #1e1e1e;
+    --code-text: #d4d4d4;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 1rem 3rem;
+  line-height: 1.6;
+  background: var(--bg);
+  color: var(--text);
+  transition: background 0.3s, color 0.3s;
+}
+.banner {
+  background: var(--banner-bg);
+  color: var(--banner-text);
+  padding: 1rem 1.5rem;
+  margin: 0 -1rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+.banner h1 { margin: 0; font-size: 1.25rem; font-weight: 600; }
+.banner-actions { display: flex; gap: 0.5rem; align-items: center; }
+.banner-btn {
+  background: rgba(255,255,255,0.2);
+  border: 1px solid rgba(255,255,255,0.4);
+  color: var(--banner-text);
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: background 0.2s, transform 0.1s;
+}
+.banner-btn:hover { background: rgba(255,255,255,0.3); }
+.banner-btn:active { transform: scale(0.98); }
+.banner-progress {
+  background: rgba(0,0,0,0.2);
+  border-radius: 999px;
+  height: 8px;
+  width: 120px;
+  overflow: hidden;
+}
+.banner-progress::before {
+  content: attr(data-label);
+  position: absolute;
+  left: -80px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.7rem;
+  white-space: nowrap;
+  opacity: 0.9;
+}
+.banner-progress-fill {
+  background: var(--banner-text);
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.5s ease;
+  width: 0%;
+}
+h1 { border-bottom: 2px solid var(--primary); padding-bottom: 0.5rem; color: var(--primary); margin-top: 0; }
+nav {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+nav a {
+  display: inline-block;
+  margin: 0.5rem 1rem 0.5rem 0;
+  text-decoration: none;
+  color: var(--primary);
+  font-weight: 500;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  transition: background 0.2s, color 0.2s, transform 0.1s;
+}
+nav a:hover { background: var(--socratic-bg); color: var(--accent-hover); transform: translateX(4px); }
+section { margin: 2rem 0; }
+.socratic {
+  border-left: 4px solid var(--socratic-border);
+  padding: 1rem 1.25rem;
+  margin: 1.5rem 0;
+  background: var(--socratic-bg);
+  border-radius: 0 10px 10px 0;
+  position: relative;
+}
+.socratic::before {
+  content: "💡 Check your understanding";
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--socratic-border);
+  margin-bottom: 0.5rem;
+}
+.socratic p { margin: 0; }
+table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+th, td { padding: 0.75rem; border-bottom: 1px solid var(--border); text-align: left; }
+th { background: var(--primary); color: #fff; font-weight: 600; }
+tr:hover td { background: var(--socratic-bg); }
+pre { background: var(--code-bg); color: var(--code-text); padding: 1rem; border-radius: 10px; overflow-x: auto; margin: 1rem 0; }
+code { font-family: 'Monaco', 'Menlo', 'Consolas', monospace; font-size: 0.9em; }
+details { background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; margin: 1rem 0; overflow: hidden; }
+summary { padding: 1rem 1.25rem; cursor: pointer; font-weight: 600; list-style: none; display: flex; align-items: center; gap: 0.5rem; }
+summary::-webkit-details-marker { display: none; }
+summary::after { content: "▶"; font-size: 0.7rem; color: var(--muted); transition: transform 0.2s; margin-left: auto; }
+details[open] summary::after { transform: rotate(90deg); }
+details[open] summary { border-bottom: 1px solid var(--border); }
+details > div { padding: 1rem 1.25rem; }
+progress { width: 100%; height: 10px; border-radius: 5px; appearance: none; }
+progress::-webkit-progress-bar { background: var(--border); border-radius: 5px; }
+progress::-webkit-progress-value { background: var(--accent); border-radius: 5px; }
+progress::-moz-progress-bar { background: var(--accent); border-radius: 5px; }
+.checklist { list-style: none; padding: 0; margin: 1rem 0; }
+.checklist li {
+  display: flex; align-items: flex-start; gap: 0.75rem;
+  padding: 0.75rem; background: var(--card-bg); border: 1px solid var(--border);
+  border-radius: 8px; margin: 0.5rem 0; transition: all 0.2s;
+}
+.checklist li:hover { border-color: var(--accent); transform: translateX(4px); }
+.checklist input[type="checkbox"] { width: 1.1rem; height: 1.1rem; accent-color: var(--accent); flex-shrink: 0; margin-top: 0.15rem; }
+.checklist label { cursor: pointer; flex: 1; }
+.tooltip { position: relative; border-bottom: 1px dotted var(--muted); cursor: help; }
+.tooltip::after {
+  content: attr(data-tip);
+  position: absolute; bottom: 125%; left: 50%; transform: translateX(-50%);
+  background: var(--primary); color: #fff; padding: 0.5rem 0.75rem;
+  border-radius: 6px; font-size: 0.8rem; white-space: nowrap;
+  opacity: 0; visibility: hidden; transition: all 0.2s; pointer-events: none; z-index: 10;
+}
+.tooltip:hover::after { opacity: 1; visibility: visible; }
+.accordion-group { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin: 1rem 0; }
+.accordion-group details { border: none; border-radius: 0; margin: 0; }
+.accordion-group summary { border-bottom: 1px solid var(--border); }
+.accordion-group details:last-child summary { border-bottom: none; }
+.interactive-demo { background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem; margin: 1.5rem 0; }
+.interactive-demo h3 { margin-top: 0; color: var(--primary); }
+.demo-controls { display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 1rem 0; }
+.demo-btn {
+  background: var(--accent); color: #fff; border: none; padding: 0.5rem 1rem;
+  border-radius: 6px; cursor: pointer; font-weight: 500; transition: all 0.2s;
+}
+.demo-btn:hover { background: var(--accent-hover); transform: translateY(-1px); }
+.demo-btn:active { transform: translateY(0); }
+.demo-btn.secondary { background: var(--muted); }
+.demo-output { background: var(--code-bg); color: var(--code-text); padding: 1rem; border-radius: 8px; min-height: 60px; font-family: monospace; white-space: pre-wrap; overflow-x: auto; }
+.footer-note { text-align: center; color: var(--muted); font-size: 0.85rem; margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+@media (max-width: 600px) {
+  .banner { margin: 0 -1rem 1.5rem; padding: 1rem; }
+  .banner h1 { font-size: 1.1rem; }
+  .banner-progress { width: 80px; }
+  .banner-progress::before { display: none; }
+  nav a { display: block; margin: 0.5rem 0; }
+}
+</style>
+</head>
+<body>
+<div class="banner" role="banner">
+  <h1>🔬 Lesson 2: Advanced Topics — Force Fields &amp; Property Calculation</h1>
+  <div class="banner-actions">
+    <div class="banner-progress" data-label="Progress" id="courseProgress">
+      <div class="banner-progress-fill" id="progressFill"></div>
+    </div>
+    <button class="banner-btn" id="themeToggle" aria-label="Toggle theme">🌙</button>
+    <button class="banner-btn" id="tocToggle" aria-label="Show table of contents">📋</button>
+  </div>
+</div>
+
+<h1>2. Advanced Topics: Force Fields &amp; Property Calculation</h1>
+
+<nav>
+  <a href="index.html">← Course Home</a>
+  <a href="molecular-dynamics.html">MD Fundamentals ←</a>
+  <a href="mdtransport-performance.html">MDTransport Performance →</a>
+</nav>
+
+<section>
+  <h2>Force Field Selection for Ionic Liquids</h2>
+  <p>The force field is the single most important choice for IL simulation quality. No universal FF exists; selection depends on your IL class and target properties.</p>
+
+  <div class="accordion-group">
+    <details open>
+      <summary>📋 Force Field Comparison Table</summary>
+      <div>
+        <table>
+          <tr><th>FF Family</th><th>Charge Model</th><th>Best For</th><th>Caveats</th></tr>
+          <tr><td>CL&amp;P / OPLS-AA</td><td>Full integer charges (±1)</td><td>Imidazolium, pyrrolidinium ILs</td><td>Overstructured; high viscosity</td></tr>
+          <tr><td>CL&amp;P scaled (0.8e)</td><td>Scaled charges (±0.8)</td><td>Transport properties</td><td>Ad hoc scaling; less transferable</td></tr>
+          <tr><td>AMOEBA / Drude polarizable</td><td>Induced dipoles</td><td>Interfacial, mixed systems</td><td>10–100× cost; parameter scarcity</td></tr>
+          <tr><td>GAFF/GAFF2 + RESP</td><td>QM-derived</td><td>Novel/asymmetric ions</td><td>Requires QM per ion; validation needed</td></tr>
+          <tr><td>Coarse-grained (MARTINI, etc.)</td><td>Effective beads</td><td>Large scale, long time (μs–ms)</td><td>Loses atomistic detail; property-specific</td></tr>
+        </table>
+      </div>
+    </details>
+  </div>
+
+  <p><strong>Key principle:</strong> Validate your FF against experimental density, viscosity, and conductivity <em>before</em> computing novel properties. A 5% density error often means 2–3× viscosity error.</p>
+
+  <div class="interactive-demo">
+    <h3>🔬 Interactive: Force Field Selector</h3>
+    <p>Get force field recommendations based on your ionic liquid and target properties:</p>
+    <div class="demo-controls">
+      <label>Cation type: <select id="cationType"><option value="imidazolium">Imidazolium (e.g., [C<sub>n</sub>mim]⁺)</option><option value="pyrrolidinium">Pyrrolidinium (e.g., [C<sub>n</sub>mpyr]⁺)</option><option value="piperidinium">Piperidinium</option><option value="ammonium">Ammonium / Phosphonium</option><option value="custom">Novel / asymmetric</option></select></label>
+      <label>Anion type: <select id="anionType"><option value="ntf2">[NTf<sub>2</sub>]⁻</option><option value="pf6">[PF<sub>6</sub>]⁻</option><option value="bf4">[BF<sub>4</sub>]⁻</option><option value="cl">Cl⁻</option><option value="custom">Other / novel</option></select></label>
+      <label>Primary target: <select id="ffTarget"><option value="structure">Structure (RDFs, domains)</option><option value="transport">Transport (diffusion, conductivity, viscosity)</option><option value="interface">Interfaces / mixtures</option><option value="thermo">Thermodynamics (density, enthalpy)</option></select></label>
+    </div>
+    <button class="demo-btn" onclick="recommendFF()">Get Recommendation</button>
+    <div class="demo-output" id="ffOutput">Select options and click recommend...</div>
+  </div>
+</section>
+
+<div class="socratic" data-question="ff-validation">
+  <p>You simulate [C<sub>4</sub>mim][NTf<sub>2</sub>] with CL&amp;P and get density within 1% but viscosity 3× too high. Your colleague says "just scale charges to 0.8e." Why is this problematic for predicting the diffusion coefficient of a solute in this IL?</p>
+</div>
+
+<section>
+  <h2>Structural Analysis: Beyond RDFs</h2>
+  <p>Standard radial distribution functions (RDFs) are necessary but insufficient for ILs.</p>
+
+  <div class="accordion-group">
+    <details open>
+      <summary>🔍 Essential Analysis Types</summary>
+      <div>
+        <ul>
+          <li><strong>Cation–anion RDF (center-of-mass):</strong> First peak position → contact distance; coordination number from integral.</li>
+          <li><strong>Cation–cation / anion–anion RDFs:</strong> Reveal like-charge ordering (should be repulsive at short range).</li>
+          <li><strong>Spatial distribution functions (SDF):</strong> 3D maps of anion around cation (and vice versa). Use <code>gmx spatial</code> or <code>VMD VolMap</code>.</li>
+          <li><strong>Domain analysis:</strong> Identify polar/apolar nanodomains via clustering (e.g., alkyl tail aggregation).</li>
+          <li><strong>Orientation correlation:</strong> Angle between cation ring plane and anion approach vector.</li>
+        </ul>
+      </div>
+    </details>
+    <details>
+      <summary>💻 GROMACS Commands for Coordination Number</summary>
+      <div>
+        <pre><code># GROMACS: coordination number from RDF
+gmx rdf -f prod.xtc -s prod.tpr -n index.ndx -o rdf_cation_anion.xvg
+# Select cation COM as ref, anion COM as sel
+# Coordination number = 4πρ ∫<sub>0</sub><sup>r<sub>min</sub></sup> g(r) r² dr</code></pre>
+      </div>
+    </details>
+  </div>
+
+  <div class="interactive-demo">
+    <h3>📊 Interactive: Coordination Number Calculator</h3>
+    <p>Compute coordination number from RDF data (paste first peak region):</p>
+    <div class="demo-controls">
+      <label>Bulk number density (nm⁻³): <input type="number" id="bulkDensity" value="3.5" min="1" max="10" step="0.1"></label>
+      <label>First minimum r (nm): <input type="number" id="rMin" value="0.55" min="0.3" max="1.0" step="0.01"></label>
+      <label>RDF peak height g(r): <input type="number" id="peakHeight" value="2.8" min="1" max="10" step="0.1"></label>
+    </div>
+    <button class="demo-btn" onclick="calcCoord()">Calculate Coordination Number</button>
+    <div class="demo-output" id="coordOutput">Enter values and click calculate...</div>
+  </div>
+</section>
+
+<div class="socratic" data-question="sdf-interpretation">
+  <p>Your SDF shows anions preferentially above/below the imidazolium ring plane rather than at the alkyl chain. What does this reveal about the cation–anion interaction mechanism, and how would it differ for a pyrrolidinium cation?</p>
+</div>
+
+<section>
+  <h2>Dynamical Properties</h2>
+
+  <h3>Self-Diffusion Coefficients</h3>
+  <div class="accordion-group">
+    <details open>
+      <summary>📈 MSD Analysis</summary>
+      <div>
+        <p>From mean-squared displacement (MSD):</p>
+        <pre><code>gmx msd -f prod.xtc -s prod.tpr -n index.ndx -o msd.xvg -trestart 10
+# D = lim(t→∞) ⟨|r(t) - r(0)|²⟩ / 6t
+# Fit linear regime (typically 10–100 ns for ILs)</code></pre>
+        <p>Check: cation and anion D should be similar (within ~20%) for pure ILs. Large disparity → ion pairing/aggregation artifacts.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="interactive-demo">
+    <h3>⚡ Interactive: Diffusion Coefficient Estimator</h3>
+    <p>Estimate diffusion coefficient from MSD slope:</p>
+    <div class="demo-controls">
+      <label>MSD slope (nm²/ns): <input type="number" id="msdSlope" value="0.05" min="0.001" max="1" step="0.001"></label>
+      <label>Temperature (K): <input type="number" id="diffTemp" value="350" min="200" max="500" step="10"></label>
+      <label>Viscosity (cP): <input type="number" id="diffVisc" value="50" min="1" max="1000" step="1"></label>
+    </div>
+    <button class="demo-btn" onclick="calcDiffusion()">Calculate D &amp; Check Stokes-Einstein</button>
+    <div class="demo-output" id="diffOutput">Enter values and click calculate...</div>
+  </div>
+
+  <h3>Ionic Conductivity</h3>
+  <div class="accordion-group">
+    <details open>
+      <summary>⚡ Conductivity Calculation Methods</summary>
+      <div>
+        <p>Two equivalent routes (Green–Kubo and Nernst–Einstein):</p>
+        <pre><code># Green-Kubo (current autocorrelation)
+gmx current -f prod.xtc -s prod.tpr -n index.ndx -o conductivity.xvg
+
+# Nernst-Einstein (from self-diffusion)
+σ<sub>NE</sub> = (e² / k<sub>B</sub>TV) Σ<sub>i</sub> z<sub>i</sub>² D<sub>i</sub>
+# Compare σ<sub>GK</sub> vs σ<sub>NE</sub>; ratio = Haven ratio (H<sub>R</sub>)
+# H<sub>R</sub> < 1 indicates correlated ion motion (ion pairs, clusters)</code></pre>
+      </div>
+    </details>
+  </div>
+
+  <div class="interactive-demo">
+    <h3>🔬 Interactive: Haven Ratio Calculator</h3>
+    <p>Compute Haven ratio from GK and NE conductivity:</p>
+    <div class="demo-controls">
+      <label>σ<sub>GK</sub> (mS/cm): <input type="number" id="sigmaGK" value="2.1" min="0.1" max="100" step="0.1"></label>
+      <label>σ<sub>NE</sub> (mS/cm): <input type="number" id="sigmaNE" value="3.8" min="0.1" max="100" step="0.1"></label>
+      <label>Cation D (10⁻¹¹ m²/s): <input type="number" id="dCat" value="2.5" min="0.1" max="50" step="0.1"></label>
+      <label>Anion D (10⁻¹¹ m²/s): <input type="number" id="dAn" value="2.8" min="0.1" max="50" step="0.1"></label>
+    </div>
+    <button class="demo-btn" onclick="calcHaven()">Calculate Haven Ratio</button>
+    <div class="demo-output" id="havenOutput">Enter values and click calculate...</div>
+  </div>
+
+  <h3>Viscosity</h3>
+  <div class="accordion-group">
+    <details open>
+      <summary>🥄 Viscosity Calculation</summary>
+      <div>
+        <p>Green–Kubo (stress tensor autocorrelation) is standard but noisy:</p>
+        <pre><code>gmx energy -f prod.edr -o vis.xvg  # select Pressure tensor components
+# η = (V/k<sub>B</sub>T) ∫ ⟨P<sub>xy</sub>(t)P<sub>xy</sub>(0)⟩ dt
+# Requires &gt;100 ns; block averaging essential</code></pre>
+        <p>Alternative: non-equilibrium MD (SLLOD, periodic perturbation) for faster convergence.</p>
+      </div>
+    </details>
+  </div>
+</section>
+
+<div class="socratic" data-question="haven-ratio">
+  <p>For a pure ionic liquid, you compute σ<sub>GK</sub> = 2.1 mS/cm and σ<sub>NE</sub> = 3.8 mS/cm. What does the Haven ratio H<sub>R</sub> = 0.55 tell you about ion transport, and what structural feature would you investigate next?</p>
+</div>
+
+<section>
+  <h2>Advanced: Polarizable Force Fields</h2>
+  <p>For systems where electronic polarization matters (interfaces, mixtures with water, electric fields):</p>
+
+  <div class="accordion-group">
+    <details open>
+      <summary>🔬 Polarizable FF Options</summary>
+      <div>
+        <ul>
+          <li><strong>Drude oscillators:</strong> Massless charged particles attached to atoms via harmonic springs. Implemented in CHARMM, NAMD, OpenMM.</li>
+          <li><strong>AMOEBA:</strong> Multipole-based with induced dipoles (Thole damping). Tinker, OpenMM.</li>
+          <li><strong>Cost:</strong> 5–20× standard MD. Requires dual thermostats (real atoms + Drude particles at 1 K).</li>
+        </ul>
+        <p>When to use: computing dielectric constants, electrode interfaces, or when fixed-charge FFs fail qualitatively (e.g., IL/water miscibility).</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="interactive-demo">
+    <h3>⚖️ Interactive: Polarizable FF Cost-Benefit Analyzer</h3>
+    <p>Decide if polarizable FF is worth the cost for your system:</p>
+    <div class="demo-controls">
+      <label>System type: <select id="polSystem"><option value="bulk">Bulk pure IL</option><option value="interface">Electrode interface</option><option value="mixture">IL + water / CO<sub>2</sub></option><option value="field">Under electric field</option></select></label>
+      <label>Target property: <select id="polTarget"><option value="density">Density</option><option value="dielectric">Dielectric constant</option><option value="interface">Interfacial structure</option><option value="absorption">Gas absorption</option></select></label>
+      <label>Fixed-charge error (%): <input type="number" id="fixedError" value="5" min="0" max="50" step="1"></label>
+      <label>Budget multiplier: <input type="number" id="budgetMult" value="15" min="2" max="100" step="1"></label>
+    </div>
+    <button class="demo-btn" onclick="analyzePolarizable()">Analyze Trade-off</button>
+    <div class="demo-output" id="polarOutput">Select options and click analyze...</div>
+  </div>
+</section>
+
+<div class="socratic" data-question="polarizable-cost">
+  <p>Your fixed-charge FF gives a dielectric constant ε<sub>r</sub> = 12 for [C<sub>4</sub>mim][NTf<sub>2</sub>] but experiment is 11.5. A polarizable FF gives 11.3 but costs 15× more. For studying CO<sub>2</sub> absorption in this IL, would you justify the polarizable FF? What property would be the deciding factor?</p>
+</div>
+
+<section>
+  <h2>Best Practices Checklist</h2>
+  <p>Before publishing or relying on your results, verify each item:</p>
+  <ul class="checklist" id="bestPracticeChecklist">
+    <li><input type="checkbox" id="bp1"><label for="bp1">Validate FF against density, viscosity, conductivity at your T, P</label></li>
+    <li><input type="checkbox" id="bp2"><label for="bp2">Use PME with verified energy conservation (NVE test)</label></li>
+    <li><input type="checkbox" id="bp3"><label for="bp3">Run ≥3 independent replicas for error bars</label></li>
+    <li><input type="checkbox" id="bp4"><label for="bp4">Check cation/anion diffusion ratio ≈ 1</label></li>
+    <li><input type="checkbox" id="bp5"><label for="bp5">Compute Haven ratio to detect ion pairing</label></li>
+    <li><input type="checkbox" id="bp6"><label for="bp6">For structural analysis: RDFs + SDFs + domain analysis</label></li>
+    <li><input type="checkbox" id="bp7"><label for="bp7">Report: FF name, charge model, cutoff, PME params, ensemble, run length, # replicas</label></li>
+  </ul>
+  <progress id="bpProgress" value="0" max="7" aria-label="Best practices completion"></progress>
+  <small id="bpProgressText">0 of 7 complete</small>
+</section>
+
+<footer class="footer-note">
+  <p>Part of the OSU LLM Workshop series. <a href="index.html">← Course Home</a> | <a href="molecular-dynamics.html">MD Fundamentals ←</a></p>
+</footer>
+
+<div id="tocPanel" style="display:none; position:fixed; top:80px; right:1rem; width:280px; max-height:70vh; overflow:auto; background:var(--card-bg); border:1px solid var(--border); border-radius:10px; padding:1rem; box-shadow:0 4px 20px rgba(0,0,0,0.2); z-index:100;">
+  <h3 style="margin-top:0;">📑 Table of Contents</h3>
+  <nav id="tocNav"></nav>
+  <button class="demo-btn secondary" style="width:100%; margin-top:1rem;" onclick="document.getElementById('tocPanel').style.display='none'">Close</button>
+</div>
+
+<script>
+(function() {
+  'use strict';
+  const STORAGE_KEY = 'il-course-progress';
+  const THEME_KEY = 'il-course-theme';
+
+  const themeToggle = document.getElementById('themeToggle');
+  function applyTheme(theme) {
+    if (theme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    else document.documentElement.removeAttribute('data-theme');
+    themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
+  }
+  const savedTheme = localStorage.getItem(THEME_KEY) || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  applyTheme(savedTheme);
+  themeToggle.addEventListener('click', () => {
+    const newTheme = document.documentElement.hasAttribute('data-theme') ? 'light' : 'dark';
+    localStorage.setItem(THEME_KEY, newTheme);
+    applyTheme(newTheme);
+  });
+
+  function loadProgress() { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{"visited":[], "checks":{}}'); }
+  function saveProgress(p) { localStorage.setItem(STORAGE_KEY, JSON.stringify(p)); }
+  function updateProgressUI() {
+    const p = loadProgress();
+    const pages = ['index.html', 'molecular-dynamics.html', 'advanced-topics.html'];
+    const currentPage = location.pathname.split('/').pop() || 'index.html';
+    if (!p.visited.includes(currentPage)) { p.visited.push(currentPage); saveProgress(p); }
+    const visitedCount = pages.filter(pg => p.visited.includes(pg)).length;
+    const pct = Math.round((visitedCount / pages.length) * 100);
+    const fill = document.getElementById('progressFill');
+    if (fill) fill.style.width = pct + '%';
+  }
+
+  // Best practices checklist
+  const bpChecks = document.querySelectorAll('#bestPracticeChecklist input[type="checkbox"]');
+  function loadBP() {
+    const p = loadProgress();
+    bpChecks.forEach((cb, i) => { cb.checked = p.checks['bp'+(i+1)] || false; });
+    updateBPProgress();
+  }
+  function updateBPProgress() {
+    let checked = 0;
+    bpChecks.forEach(cb => { if (cb.checked) checked++; });
+    const prog = document.getElementById('bpProgress');
+    const text = document.getElementById('bpProgressText');
+    if (prog) prog.value = checked;
+    if (text) text.textContent = checked + ' of ' + bpChecks.length + ' complete';
+    const p = loadProgress();
+    bpChecks.forEach((cb, i) => { p.checks['bp'+(i+1)] = cb.checked; });
+    saveProgress(p);
+  }
+  bpChecks.forEach(cb => cb.addEventListener('change', updateBPProgress));
+
+  function buildTOC() {
+    const nav = document.getElementById('tocNav');
+    const headings = document.querySelectorAll('h2, h3');
+    headings.forEach(h => {
+      if (!h.id) h.id = h.textContent.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      const a = document.createElement('a');
+      a.href = '#' + h.id;
+      a.textContent = h.textContent;
+      a.style.display = 'block';
+      a.style.padding = '0.3rem 0';
+      a.style.color = 'var(--text)';
+      a.style.textDecoration = 'none';
+      a.style.borderBottom = '1px solid var(--border)';
+      a.onclick = () => document.getElementById('tocPanel').style.display = 'none';
+      nav.appendChild(a);
+    });
+  }
+
+  // Interactive demos
+  window.recommendFF = function() {
+    const cat = document.getElementById('cationType').value;
+    const an = document.getElementById('anionType').value;
+    const target = document.getElementById('ffTarget').value;
+    let rec = '', alt = '', note = '';
+    if (cat === 'custom' || an === 'custom') {
+      rec = 'GAFF/GAFF2 + RESP charges';
+      alt = 'CL&P with QM validation';
+      note = 'Novel ions require QM-derived charges. Run validation against density/viscosity.';
+    } else if (target === 'transport') {
+      rec = 'CL&P with 0.8e charge scaling';
+      alt = 'Drude polarizable if budget allows';
+      note = 'Scaled charges improve diffusion/viscosity but validate structure.';
+    } else if (target === 'interface' || target === 'mixture') {
+      rec = 'Drude polarizable (CHARMM/OpenMM)';
+      alt = 'AMOEBA (OpenMM/Tinker)';
+      note = 'Polarization critical at interfaces. 10-20× cost.';
+    } else if (target === 'structure') {
+      rec = 'CL&P / OPLS-AA (full charges)';
+      alt = 'GAFF2 if params available';
+      note = 'Full charges give best structure but overestimate viscosity.';
+    } else {
+      rec = 'CL&P / OPLS-AA';
+      alt = 'Validate first!';
+      note = 'Density is usually well-predicted by standard FFs.';
+    }
+    document.getElementById('ffOutput').textContent =
+      `🎯 Recommended: ${rec}\n` +
+      `🔄 Alternative: ${alt}\n` +
+      `📝 ${note}\n\n` +
+      `💡 Always validate: density ±2%, viscosity ±30%, conductivity ±50%.`;
+  };
+
+  window.calcCoord = function() {
+    const rho = parseFloat(document.getElementById('bulkDensity').value);
+    const rmin = parseFloat(document.getElementById('rMin').value);
+    const gmax = parseFloat(document.getElementById('peakHeight').value);
+    // Approximate: CN ≈ 4πρ ∫ g(r) r² dr ≈ 4πρ g_max * (rmin³/3)
+    const cn = 4 * Math.PI * rho * gmax * (rmin**3 / 3);
+    document.getElementById('coordOutput').textContent =
+      `📊 Bulk density: ${rho} nm⁻³\n` +
+      `📏 First minimum: ${rmin} nm\n` +
+      `📈 Peak g(r): ${gmax}\n` +
+      `🔢 Coordination number (approx): ${cn.toFixed(2)}\n\n` +
+      `💡 For accurate CN, integrate numerically from full RDF data.`;
+  };
+
+  window.calcDiffusion = function() {
+    const slope = parseFloat(document.getElementById('msdSlope').value);
+    const T = parseFloat(document.getElementById('diffTemp').value);
+    const visc = parseFloat(document.getElementById('diffVisc').value);
+    const D = slope / 6; // nm²/ns
+    const D_m2s = D * 1e-18 / 1e-9; // m²/s
+    // Stokes-Einstein: D = kT / (6πηr)
+    const kB = 1.380649e-23;
+    const eta = visc * 1e-3; // Pa·s
+    const r_est = kB * T / (6 * Math.PI * eta * D_m2s);
+    document.getElementById('diffOutput').textContent =
+      `⚡ D from MSD: ${D.toFixed(4)} nm²/ns = ${(D_m2s*1e11).toFixed(2)} × 10⁻¹¹ m²/s\n` +
+      `🔬 Stokes-Einstein radius: ${(r_est*1e10).toFixed(2)} Å\n` +
+      `📏 Typical ion radius: 3–5 Å\n` +
+      (r_est > 6e-10 ? `⚠️ Radius too large → SE breakdown (common in ILs)` : `✅ Consistent with SE relation`)\n\n` +
+      `💡 In ILs, SE often breaks down due to dynamic heterogeneity.`;
+  };
+
+  window.calcHaven = function() {
+    const sgk = parseFloat(document.getElementById('sigmaGK').value);
+    const sne = parseFloat(document.getElementById('sigmaNE').value);
+    const dcat = parseFloat(document.getElementById('dCat').value) * 1e-11;
+    const dan = parseFloat(document.getElementById('dAn').value) * 1e-11;
+    const HR = sgk / sne;
+    const ratio = dcat / dan;
+    let interpretation = '';
+    if (HR < 0.3) interpretation = 'Strong ion pairing/clustering';
+    else if (HR < 0.6) interpretation = 'Moderate correlations (ion pairs)';
+    else if (HR < 0.9) interpretation = 'Weak correlations';
+    else interpretation = 'Nearly uncorrelated (ideal)';
+    document.getElementById('havenOutput').textContent =
+      `📊 σ_GK = ${sgk} mS/cm\n` +
+      `📊 σ_NE = ${sne} mS/cm\n` +
+      `⚖️ Haven ratio H_R = ${HR.toFixed(3)}\n` +
+      `🔄 Cation/anion D ratio = ${ratio.toFixed(2)}\n` +
+      `💡 Interpretation: ${interpretation}\n\n` +
+      (HR < 0.6 ? `🔍 Next: Check RDF for contact ion pairs, compute cluster size distribution.` : `✅ Transport relatively uncorrelated.`);
+  };
+
+  window.analyzePolarizable = function() {
+    const sys = document.getElementById('polSystem').value;
+    const target = document.getElementById('polTarget').value;
+    const err = parseInt(document.getElementById('fixedError').value);
+    const mult = parseInt(document.getElementById('budgetMult').value);
+    let recommend = false, reason = '';
+    if (sys === 'interface' || sys === 'field') { recommend = true; reason = 'Polarization essential at interfaces/fields.'; }
+    else if (sys === 'mixture' && (target === 'dielectric' || target === 'absorption')) { recommend = true; reason = 'Polarization critical for dielectric response and solvation.'; }
+    else if (target === 'dielectric') { recommend = err > 10; reason = 'Fixed-charge FFs cannot reproduce dielectric constant accurately.'; }
+    else { recommend = false; reason = 'Fixed-charge FF usually sufficient for bulk structure/thermodynamics.'; }
+    document.getElementById('polarOutput').textContent =
+      `🖥️ System: ${sys}\n` +
+      `🎯 Target: ${target}\n` +
+      `📉 Fixed-charge error: ~${err}%\n` +
+      `💰 Cost multiplier: ${mult}×\n\n` +
+      `${recommend ? '✅' : '❌'} Polarizable FF: ${recommend ? 'RECOMMENDED' : 'NOT RECOMMENDED'}\n` +
+      `📝 ${reason}\n\n` +
+      (recommend ? `💡 Use Drude (CHARMM/OpenMM) for best software support.` : `💡 Save compute; invest in longer fixed-charge runs instead.`);
+  };
+
+  document.getElementById('tocToggle').addEventListener('click', () => {
+    const panel = document.getElementById('tocPanel');
+    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+  });
+
+  updateProgressUI();
+  loadBP();
+  buildTOC();
+
+  document.addEventListener('keydown', e => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+    if (e.key === 't') themeToggle.click();
+    if (e.key === 'c') document.getElementById('tocToggle').click();
+  });
+})();
+</script>
+<script src="socratic.js" defer></script>
+</body>
+</html>

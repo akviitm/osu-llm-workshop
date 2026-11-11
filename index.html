@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MDTransport - Modular Transport Property Analysis for MD Simulations</title>
+    <meta name="description" content="MDTransport: A modular, open-source, extensible Python tool for computing transport properties from GROMACS and LAMMPS simulations.">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <nav class="nav container">
+            <a href="index.html" class="nav-brand">
+                <svg class="logo" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="32" height="32" rx="6" fill="currentColor"/>
+                    <path d="M8 12h16M8 16h12M8 20h8" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+                </svg>
+                <span>MDTransport</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html" class="active">Overview</a></li>
+                <li><a href="features.html">Features</a></li>
+                <li><a href="theory.html">Theory</a></li>
+                <li><a href="installation.html">Installation</a></li>
+                <li><a href="performance.html">Performance</a></li>
+                <li><a href="references.html">References</a></li>
+            </ul>
+            <a href="https://github.com/ShahResearchGroup/MDTransport" class="nav-github" target="_blank" rel="noopener">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+                GitHub
+            </a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <div class="hero-content">
+                    <div class="hero-badge">
+                        <span class="badge">J. Chem. Inf. Model. 2026, 66, 9989−10003</span>
+                        <span class="badge doi">DOI: 10.1021/acs.jcim.6c00558</span>
+                    </div>
+                    <h1 class="hero-title">MDTransport</h1>
+                    <p class="hero-subtitle">A Modular, Open-Source, Extensible Python Tool for Computing Transport Properties from GROMACS and LAMMPS Simulations</p>
+                    <div class="hero-authors">
+                        <span class="author">Ashutosh Kumar Verma</span>
+                        <span class="author">Amey S. Thorat</span>
+                        <span class="author corresponding">Jindal K. Shah*</span>
+                    </div>
+                    <div class="hero-affiliation">School of Chemical Engineering, Oklahoma State University, Stillwater, Oklahoma 74078, United States</div>
+                    <div class="hero-actions">
+                        <a href="https://github.com/ShahResearchGroup/MDTransport" class="btn btn-primary" target="_blank" rel="noopener">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+                            View on GitHub
+                        </a>
+                        <a href="https://shahresearchgroup.org" class="btn btn-secondary" target="_blank" rel="noopener">
+                            Shah Research Group
+                        </a>
+                        <a href="https://pypi.org/project/MDTransport/" class="btn btn-secondary" target="_blank" rel="noopener">
+                            PyPI Package
+                        </a>
+                    </div>
+                </div>
+                <div class="hero-visual">
+                    <div class="architecture-diagram">
+                        <div class="arch-layer">
+                            <h4>Interfaces</h4>
+                            <div class="arch-items">
+                                <div class="arch-item cli">CLI (HPC)</div>
+                                <div class="arch-item desktop">Desktop App</div>
+                                <div class="arch-item web">Web Interface</div>
+                            </div>
+                        </div>
+                        <div class="arch-arrow">↓</div>
+                        <div class="arch-layer">
+                            <h4>Core Engine</h4>
+                            <div class="arch-items">
+                                <div class="arch-item core">main.py</div>
+                                <div class="arch-item core">gromacs.py</div>
+                                <div class="arch-item core">lammps.py</div>
+                            </div>
+                        </div>
+                        <div class="arch-arrow">↓</div>
+                        <div class="arch-layer">
+                            <h4>Utilities</h4>
+                            <div class="arch-items utils-grid">
+                                <div class="arch-item util">utils_msd.py</div>
+                                <div class="arch-item util">utils_einstein.py</div>
+                                <div class="arch-item util">utils_eh.py</div>
+                                <div class="arch-item util">utils_onsager.py</div>
+                                <div class="arch-item util">utils_rdf.py</div>
+                                <div class="arch-item util">utils_cluster.py</div>
+                                <div class="arch-item util">utils_cage.py</div>
+                                <div class="arch-item util">utils.py</div>
+                            </div>
+                        </div>
+                        <div class="arch-arrow">↓</div>
+                        <div class="arch-layer">
+                            <h4>Properties Computed</h4>
+                            <div class="arch-items props-grid">
+                                <div class="arch-item prop">Self-Diffusion</div>
+                                <div class="arch-item prop">Onsager Coefficients</div>
+                                <div class="arch-item prop">Einstein σ</div>
+                                <div class="arch-item prop">Nernst-Einstein σ</div>
+                                <div class="arch-item prop">Transference Numbers</div>
+                                <div class="arch-item prop">Ion-Ion Correlation</div>
+                                <div class="arch-item prop">Spatial Decomposition</div>
+                                <div class="arch-item prop">Cage/Pair Lifetimes</div>
+                                <div class="arch-item prop">Cluster Analysis</div>
+                                <div class="arch-item prop">Transport Mechanism</div>
+                                <div class="arch-item prop">RDF</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="highlights">
+            <div class="container">
+                <h2 class="section-title">Key Capabilities</h2>
+                <div class="highlights-grid">
+                    <article class="highlight-card">
+                        <div class="highlight-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                        </div>
+                        <h3>Multi-Engine Support</h3>
+                        <p>Process trajectories from both GROMACS and LAMMPS with a unified interface. No need to learn multiple tools.</p>
+                    </article>
+                    <article class="highlight-card">
+                        <div class="highlight-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"></rect><path d="M8 21h8"></path><path d="M12 17v4"></path></svg>
+                        </div>
+                        <h3>Three Interfaces</h3>
+                        <p>Prompt-based CLI for HPC, cross-platform desktop app, and cloud web interface — choose what fits your workflow.</p>
+                    </article>
+                    <article class="highlight-card">
+                        <div class="highlight-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                        </div>
+                        <h3>Comprehensive Properties</h3>
+                        <p>Self-diffusion, ionic conductivity (Einstein & Nernst-Einstein), Onsager coefficients, transference numbers, and more.</p>
+                    </article>
+                    <article class="highlight-card">
+                        <div class="highlight-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                        </div>
+                        <h3>Advanced Analyses</h3>
+                        <p>Ion-ion correlations, spatial decomposition (SPDA), cage/pair correlation lifetimes, cluster analysis, transport mechanisms.</p>
+                    </article>
+                    <article class="highlight-card">
+                        <div class="highlight-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+                        </div>
+                        <h3>Modular Architecture</h3>
+                        <p>Engine-independent calculation algorithms. Each property module is a self-contained class for easy extension.</p>
+                    </article>
+                    <article class="highlight-card">
+                        <div class="highlight-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                        </div>
+                        <h3>Open Source (GPL)</h3>
+                        <p>Free to use, modify, and distribute. Hosted on GitHub with comprehensive documentation and example data.</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="citation">
+            <div class="container">
+                <h2 class="section-title">Citation</h2>
+                <div class="citation-box">
+                    <pre><code>Verma, A. K.; Thorat, A. S.; Shah, J. K.
+MDTransport: A Modular, Open-Source, Extensible Python Tool 
+for Computing Transport Properties from GROMACS and LAMMPS Simulations.
+<em>J. Chem. Inf. Model.</em> <strong>2026</strong>, <em>66</em>, 9989−10003.
+DOI: <a href="https://doi.org/10.1021/acs.jcim.6c00558">10.1021/acs.jcim.6c00558</a></code></pre>
+                    <button class="btn btn-copy" onclick="copyCitation()">Copy Citation</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="quick-start">
+            <div class="container">
+                <h2 class="section-title">Quick Start</h2>
+                <div class="quick-start-grid">
+                    <div class="quick-step">
+                        <div class="step-number">1</div>
+                        <h3>Install</h3>
+                        <pre><code>pip install MDTransport</code></pre>
+                        <p>Or via Conda: <code>conda install -c conda-forge mdtransport</code></p>
+                    </div>
+                    <div class="quick-step">
+                        <div class="step-number">2</div>
+                        <h3>Run Interactive CLI</h3>
+                        <pre><code>mdt</code></pre>
+                        <p>Follow prompts to select analysis type, trajectory, and parameters.</p>
+                    </div>
+                    <div class="quick-step">
+                        <div class="step-number">3</div>
+                        <h3>Or Run Directly</h3>
+                        <pre><code>mdt --msd --corr --ne --rdf \
+  --traj trajectory.xtc \
+  --top topology.tpr \
+  --t_steps 20</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-links">
+                    <a href="https://github.com/ShahResearchGroup/MDTransport" target="_blank" rel="noopener">GitHub</a>
+                    <a href="https://shahresearchgroup.org" target="_blank" rel="noopener">Shah Research Group</a>
+                    <a href="https://pypi.org/project/MDTransport/" target="_blank" rel="noopener">PyPI</a>
+                    <a href="https://doi.org/10.1021/acs.jcim.6c00558" target="_blank" rel="noopener">Paper</a>
+                </div>
+                <p class="footer-license">Licensed under GNU GPL v3.0 · © 2026 The Authors</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
